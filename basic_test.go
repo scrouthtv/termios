@@ -12,16 +12,40 @@ func TestBasicOpen(t *testing.T) {
 
 	var buf []byte = make([]byte, 1024)
 
-	term.Read(buf)
-	term.Write([]byte("Hello world!\n"))
+	_, err = term.Read(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = term.Write([]byte("Hello world!\n"))
+	if err != nil {
+		t.Error(err)
+	}
 
-	term.SetRaw(true)
-	term.Read(buf)
-	term.Write([]byte("Hello stray character!\n"))
-	term.SetRaw(false)
+	err = term.SetRaw(true)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = term.Read(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = term.Write([]byte("Hello stray character!\n"))
+	if err != nil {
+		t.Error(err)
+	}
+	err = term.SetRaw(false)
+	if err != nil {
+		t.Error(err)
+	}
 
-	term.Read(buf)
-	term.Write([]byte("Hello world!\n"))
+	_, err = term.Read(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = term.Write([]byte("Hello world!\n"))
+	if err != nil {
+		t.Error(err)
+	}
 
 	term.Close()
 }

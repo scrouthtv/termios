@@ -15,4 +15,4 @@ If any of these functions fail during execution, we try to undo all changes to t
 
 The library also exposes two file handles: `In` and `Out` which corresponds to the platform's input and output streams.
 
-This fork also makes use of Go's new, platform-specific, syscall wrappers.
+This fork also makes use of Go's new, platform-specific, syscall wrappers and all "unsafe" code should be removed.

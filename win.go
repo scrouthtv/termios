@@ -3,12 +3,17 @@
 package termios
 
 import (
-	"errors"
-	
 	"golang.org/x/sys/windows"
 )
 
-var ErrorClosed error = errors.New("I/O error: terminal is closed")
+var (
+	rawInFlags []uint32 = []uint32{
+		windows.ENABLE_PROCESSED_INPUT, windows.ENABLE_LINE_INPUT, windows.ENABLE_ECHO_INPUT,
+	}
+	rawOutFlags []uint32 = []uint32{
+		windows.ENABLE_PROCESSED_OUTPUT, windows.ENABLE_WRAP_AT_EOL_OUTPUT,
+	}
+)
 
 type winTerm struct {
 	in windows.Handle
@@ -30,18 +35,22 @@ func Open() (*winTerm, error) {
 
 	out, err = windows.Open("CONOUT$", windows.O_RDWR, 0)
 	if err != nil {
-		// TODO: close gracefully
+		windows.Close(in)
 		return nil, err
 	}
 
 	var inMode, outMode uint32
 	err = windows.GetConsoleMode(in, &inMode)
 	if err != nil {
+		windows.Close(in)
+		windows.Close(out)
 		return nil, err
 	}
 
 	err = windows.GetConsoleMode(out, &outMode)
 	if err != nil {
+		windows.Close(in)
+		windows.Close(out)
 		return nil, err
 	}
 
@@ -95,9 +104,6 @@ func (t *winTerm) SetRaw(raw bool) error {
 
 	// see https://docs.microsoft.com/en-us/windows/console/high-level-console-modes
 
-	var rawInFlags []uint32 = []uint32{windows.ENABLE_PROCESSED_INPUT, windows.ENABLE_LINE_INPUT, windows.ENABLE_ECHO_INPUT}
-	var rawOutFlags []uint32 = []uint32{windows.ENABLE_PROCESSED_OUTPUT, windows.ENABLE_WRAP_AT_EOL_OUTPUT}
-
 	var flag uint32
 
 	for _, flag = range rawInFlags {
@@ -130,5 +136,6 @@ func (t *winTerm) SetRaw(raw bool) error {
 		return err
 	}
 
+	t.isRaw = raw
 	return nil
 }
