@@ -1,4 +1,4 @@
-// +build linux freebsd dragonfly openbsd netbsd darwin
+// +build linux freebsd openbsd netbsd dragonfly darwin
 
 package termios
 
@@ -32,7 +32,7 @@ func Open() (*nixTerm, error) {
 	}
 
 	var mode *unix.Termios
-	mode, err = unix.IoctlGetTermios(in, unix.TCGETS)
+	mode, err = unix.IoctlGetTermios(in, reqGetTermios)
 	if err != nil {
 		unix.Close(in)
 		unix.Close(out)
@@ -63,8 +63,8 @@ func (t *nixTerm) IsRaw() bool {
 func (t *nixTerm) Close() {
 	t.ready = false
 
-	unix.IoctlSetTermios(t.in, unix.TCSETS, &t.oldMode)
-	unix.IoctlSetTermios(t.out, unix.TCSETS, &t.oldMode)
+	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)
+	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode)
 
 	unix.Close(t.in)
 	unix.Close(t.out)
@@ -77,7 +77,7 @@ func (t *nixTerm) SetRaw(raw bool) error {
 	var mode *unix.Termios
 	var err error
 
-	mode, err = unix.IoctlGetTermios(t.in, unix.TCGETS)
+	mode, err = unix.IoctlGetTermios(t.in, reqGetTermios)
 	if err != nil {
 		return err
 	}
@@ -94,13 +94,13 @@ func (t *nixTerm) SetRaw(raw bool) error {
 		mode = &t.oldMode
 	}
 
-	err = unix.IoctlSetTermios(t.in, unix.TCSETS, mode)
+	err = unix.IoctlSetTermios(t.in, reqSetTermios, mode)
 	if err != nil {
 		return err
 	}
-	err = unix.IoctlSetTermios(t.out, unix.TCSETS, mode)
+	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
 	if err != nil {
-		unix.IoctlSetTermios(t.in, unix.TCSETS, mode)
+		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
 		return err
 	}
 
