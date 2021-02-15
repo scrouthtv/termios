@@ -6,15 +6,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var (
-	rawInFlags []uint32 = []uint32{
-		windows.ENABLE_PROCESSED_INPUT, windows.ENABLE_LINE_INPUT, windows.ENABLE_ECHO_INPUT,
-	}
-	rawOutFlags []uint32 = []uint32{
-		windows.ENABLE_PROCESSED_OUTPUT, windows.ENABLE_WRAP_AT_EOL_OUTPUT,
-	}
-)
-
 type winTerm struct {
 	in windows.Handle
 	out windows.Handle
@@ -104,26 +95,12 @@ func (t *winTerm) SetRaw(raw bool) error {
 
 	// see https://docs.microsoft.com/en-us/windows/console/high-level-console-modes
 
-	var flag uint32
-
-	for _, flag = range rawInFlags {
-		if raw {
-			// unset processed input
-			inMode ^= flag
-		} else {
-			// set processed input
-			inMode |= flag
-		}
-	}
-
-	for _, flag = range rawOutFlags {
-		if raw {
-			// unset processed output
-			outMode ^= flag
-		} else {
-			// set processed output
-			outMode |= flag
-		}
+	if raw {
+		inMode &^= windows.ENABLE_PROCESSED_INPUT | windows.ENABLE_LINE_INPUT | windows.ENABLE_ECHO_INPUT
+		outMode &^= windows.ENABLE_PROCESSED_OUTPUT | windows.ENABLE_WRAP_AT_EOL_OUTPUT
+	} else {
+		inMode = t.oldInMode
+		outMode = t.oldOutMode
 	}
 
 	err = windows.SetConsoleMode(t.in, inMode)

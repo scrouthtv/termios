@@ -82,18 +82,28 @@ func (t *nixTerm) SetRaw(raw bool) error {
 		return err
 	}
 
-	mode.Iflag &^= unix.BRKINT | unix.ICRNL | unix.INPCK | unix.ISTRIP | unix.IXON
-	mode.Oflag &^= unix.OPOST
-	mode.Lflag &^= unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN
-	mode.Cflag &^= unix.CSIZE | unix.PARENB
-	mode.Cflag |= unix.CS8
-	mode.Cc[unix.VMIN] = 1
-	mode.Cc[unix.VTIME] = 0
+	if raw {
+		mode.Iflag &^= unix.BRKINT | unix.ICRNL | unix.INPCK | unix.ISTRIP | unix.IXON
+		mode.Oflag &^= unix.OPOST
+		mode.Lflag &^= unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN
+		mode.Cflag &^= unix.CSIZE | unix.PARENB
+		mode.Cflag |= unix.CS8
+		mode.Cc[unix.VMIN] = 1
+		mode.Cc[unix.VTIME] = 0
+	} else {
+		mode = &t.oldMode
+	}
 
 	err = unix.IoctlSetTermios(t.in, unix.TCSETS, mode)
 	if err != nil {
 		return err
 	}
 	err = unix.IoctlSetTermios(t.out, unix.TCSETS, mode)
-	return err
+	if err != nil {
+		unix.IoctlSetTermios(t.in, unix.TCSETS, mode)
+		return err
+	}
+
+	t.isRaw = raw
+	return nil
 }
