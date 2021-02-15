@@ -15,6 +15,8 @@ type winTerm struct {
 	out windows.Handle
 	ready bool
 	isRaw bool
+	oldInMode uint32
+	oldOutMode uint32
 }
 
 func Open() (*winTerm, error) {
@@ -28,10 +30,22 @@ func Open() (*winTerm, error) {
 
 	out, err = windows.Open("CONOUT$", windows.O_RDWR, 0)
 	if err != nil {
+		// TODO: close gracefully
 		return nil, err
 	}
 
-	var t winTerm = winTerm{in, out, true, false}
+	var inMode, outMode uint32
+	err = windows.GetConsoleMode(in, &inMode)
+	if err != nil {
+		return nil, err
+	}
+
+	err = windows.GetConsoleMode(out, &outMode)
+	if err != nil {
+		return nil, err
+	}
+
+	var t winTerm = winTerm{in, out, true, false, inMode, outMode}
 
 	return &t, nil
 }
@@ -54,18 +68,67 @@ func (t *winTerm) Write(p []byte) (int, error) {
 
 func (t *winTerm) Close() {
 	t.ready = false
+
+	windows.SetConsoleMode(t.in, t.oldInMode)
+	windows.SetConsoleMode(t.out, t.oldOutMode)
+
 	windows.Close(t.in)
 	windows.Close(t.out)
+
 	t.in = windows.InvalidHandle
 	t.out = windows.InvalidHandle
 }
 
-func (t *winTerm) MakeRaw() error {
+func (t *winTerm) SetRaw(raw bool) error {
+	var inMode, outMode uint32
+	var err error
 
-	return nil
-}
+	err = windows.GetConsoleMode(t.in, &inMode)
+	if err != nil {
+		return err
+	}
 
-func (t *winTerm) MakeCooked() error {
+	err = windows.GetConsoleMode(t.out, &outMode)
+	if err != nil {
+		return err
+	}
+
+	// see https://docs.microsoft.com/en-us/windows/console/high-level-console-modes
+
+	var rawInFlags []uint32 = []uint32{windows.ENABLE_PROCESSED_INPUT, windows.ENABLE_LINE_INPUT, windows.ENABLE_ECHO_INPUT}
+	var rawOutFlags []uint32 = []uint32{windows.ENABLE_PROCESSED_OUTPUT, windows.ENABLE_WRAP_AT_EOL_OUTPUT}
+
+	var flag uint32
+
+	for _, flag = range rawInFlags {
+		if raw {
+			// unset processed input
+			inMode ^= flag
+		} else {
+			// set processed input
+			inMode |= flag
+		}
+	}
+
+	for _, flag = range rawOutFlags {
+		if raw {
+			// unset processed output
+			outMode ^= flag
+		} else {
+			// set processed output
+			outMode |= flag
+		}
+	}
+
+	err = windows.SetConsoleMode(t.in, inMode)
+	if err != nil {
+		return err
+	}
+	err = windows.SetConsoleMode(t.out, outMode)
+	if err != nil {
+		windows.SetConsoleMode(t.in, t.oldInMode)
+		return err
+	}
 
 	return nil
 }

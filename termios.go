@@ -7,6 +7,5 @@ type Terminal interface {
 	IsRaw() bool
 
 	Close()
-	MakeRaw() error
-	MakeCooked() error
+	SetRaw(bool) error
 }

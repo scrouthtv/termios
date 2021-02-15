@@ -11,13 +11,17 @@ func TestBasicOpen(t *testing.T) {
 	}
 
 	var buf []byte = make([]byte, 1024)
+
 	term.Read(buf)
 	term.Write([]byte("Hello world!\n"))
 
-	term.MakeRaw()
+	term.SetRaw(true)
 	term.Read(buf)
 	term.Write([]byte("Hello stray character!\n"))
-	term.MakeCooked()
+	term.SetRaw(false)
+
+	term.Read(buf)
+	term.Write([]byte("Hello world!\n"))
 
 	term.Close()
 }

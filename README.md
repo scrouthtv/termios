@@ -14,3 +14,5 @@ If any of these functions fail during execution, we try to undo all changes to t
 \*: *raw* means that everything that the user inputs gets transferred as that to the application. In *cooked* mode, another software layer prepares the user's input (handles `<C-c>`, waits for `\`)
 
 The library also exposes two file handles: `In` and `Out` which corresponds to the platform's input and output streams.
+
+This fork also makes use of Go's new, platform-specific, syscall wrappers.
