@@ -1,6 +1,6 @@
 // +build linux
 
-package raw
+package termios
 
 import "syscall"
 

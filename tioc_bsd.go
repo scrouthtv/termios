@@ -1,6 +1,6 @@
 // +build darwin freebsd dragonfly openbsd netbsd
 
-package raw
+package termios
 
 import "syscall"
 

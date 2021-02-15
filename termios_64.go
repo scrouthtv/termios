@@ -1,6 +1,6 @@
 // +build darwin
 
-package raw
+package termios
 
 // Termios holds the TTY attributes. See man termios(4).
 // Tested on darwin/386, darwin/amd64. See termios_32.go for others.

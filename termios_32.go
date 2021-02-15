@@ -1,6 +1,6 @@
 // +build linux freebsd dragonfly openbsd netbsd
 
-package raw
+package termios
 
 // Termios holds the TTY attributes. See man termios(4).
 // Tested on linux386, linux/arm, linux/amd64,
