@@ -1,4 +1,4 @@
-package utf8
+package keys
 
 import "unicode/utf8"
 
