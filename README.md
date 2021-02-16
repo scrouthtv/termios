@@ -51,10 +51,10 @@ However, the client application has to, in turn, interpret the raw byte sequence
 
 The method `utf8.ParseUTF8()` takes a sequence of bytes (doesn't matter if there's a single or multiple keys in it) and transforms those keys into an array of high-level data while keeping all information.
 
-Currently, the `ParseUTF8()` method supports parsing these character sets:
- - "Action Keys" (0x00 - 0x1f, 0x7f)
- - Basic Latin (0x20 - 0x7e)
- - Symbols (codes starting with 0xc2)
- - Basic umlauts (codes starting with 0xc3)
+Since v2.1, the utf8 parser has been reworked to make use of Go's runes.
+Every key has a
+ - Type: either KeyLetter or KeySpecial
+ - Modifier: for KeyLetter optionally ModCtrl or ModAlt, for KeySpecial one of Special\*
+ - Value: for KeyLetter the full rune
 
 Support for parsing escape sequences (cursor keys, F keys, ...) will soon be introduced.
