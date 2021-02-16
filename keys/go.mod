@@ -1,4 +1,4 @@
-module github.com/scrouthtv/termios/utf8
+module github.com/scrouthtv/termios/keys
 
 go 1.15
 
