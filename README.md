@@ -27,8 +27,11 @@ As an example, `basic_test.go` is provided. When called, it expects the user to
 
 The demo has been tested under
  - Windows/amd64 10
- - Linux/amd64 5.4
+ - Linux/amd64 5.4 and linux/arm 5.4
  - FreeBsd/amd64 12.2, OpenBSD/amd64 6.8, NetBSD/amd64 5.8, DragonFly/amd64 5.8.3
 
 darwin has not been tested since I can't get it to work.
 From what I can tell, darwin is just BSD with a fancy-pants Kernel so it should work?
+
+ - The new `sys` package isn't available (yet?) for Plan9, so there will be no Plan9 support for now
+ - Solaris licensing is weird at the moment, so there will be no Solaris support
