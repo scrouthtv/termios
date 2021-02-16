@@ -4,11 +4,18 @@ import (
 	"testing"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/scrouthtv/termios"
 )
 
 func TestDumpKeys(t *testing.T) {
+
+	var doDump string = os.Getenv("DUMP_KEYS")
+	if runtime.GOOS != "windows" && doDump != "1" {
+		t.Skip("Set DUMP_KEYS to 1 to dump the pressed keys (interactive test)")
+	}
+
 	var err error
 	var term termios.Terminal
 

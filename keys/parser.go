@@ -2,17 +2,31 @@ package keys
 
 import "unicode/utf8"
 
+type Parser struct {
+	s specialParser
+}
+
+type specialParser interface {
+	// ParseFirst is expected to read and return the first escape sequence and its length
+	// If an error occurs, the implementation shall return InvalidKey and 1
+	ParseFirst([]byte) (Key, int)
+}
+
 type Key struct {
 	Type  byte
 	Mod   byte
 	Value rune
 }
 
+var InvalidKey = Key{KeyInvalid, 0, utf8.RuneError}
+
 const (
 	// KeyLetter is a single letter. Value is a keycode out of the Basic Latin keymap.
 	KeyLetter = iota
 	// KeySpecial indicates that this key should not be printed, but be interpreted instead
 	KeySpecial
+	// KeyInvalid is an invalid key, e. g. if an error occured during parsing
+	KeyInvalid
 )
 
 const (
@@ -22,6 +36,19 @@ const (
 	// KeyAlt is or'd to the modifier list if the alt key was pressed.
 	ModAlt
 )
+
+// Init initializes the parser.
+// Either the returned parser or the returned error is 0.
+func Init() (*Parser, error) {
+	var s specialParser
+	var err error
+	// newSpecialParser should initialize the special parser
+	s, err = newSpecialParser()
+	if err != nil {
+		return nil, err
+	}
+	return &Parser{s}, nil
+}
 
 func parseX1B(in []byte) Key {
 	return Key{0, 0, 0}

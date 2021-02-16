@@ -1,8 +1,17 @@
 package keys
 
 const (
+	// SpecialBackspace is the key that deletes the character to the left of the cursor
 	SpecialBackspace = iota
+	// SpecialDelete is the key that deletes the character to the right of the cursor
+	SpecialDelete
 	SpecialEnter
+	SpecialArrowLeft
+	SpecialArrowRight
+	SpecialArrowUp
+	SpecialArrowDown
+	SpecialHome
+	SpecialEnd
 	SpecialF1
 	SpecialF2
 	SpecialF3
