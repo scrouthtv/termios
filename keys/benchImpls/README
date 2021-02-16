@@ -1,0 +1,16 @@
+Comparing terminfo implementations
+==================================
+
+Since terminfo is in binary format, I'd like to avoid doing anything with it itself.
+
+From what I can tell, there are two libraries for reading terminfo files:
+ - [https://github.com/ijc/Gotty](ijc's gotty), originally made by Nvveen
+ - [https://github.com/xo/terminfo](xo's terminfo), originally made by charithe
+
+Both projects seem dead and have no issue tracker, so we'll see how this turns out.
+
+I did some testing:
+ - No library is much faster than the other one (both take around .1 ms for parsing the entire file).
+ - Both aren't able to read all files (terminfo fails on xterm-256color, gotty even on something as simple as termite).
+
+I'll try implementing terminfo functionality for now using `terminfo`.
