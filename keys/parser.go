@@ -50,38 +50,37 @@ func Init() (*Parser, error) {
 	return &Parser{s}, nil
 }
 
-func parseX1B(in []byte) Key {
-	return Key{0, 0, 0}
-}
-
 // ParseUTF8 splits the inputted bytes into logical keypresses
-func ParseUTF8(in []byte) []Key {
+func (p *Parser) ParseUTF8(in []byte) []Key {
 	var i, n int
 	var r rune
+	var key Key
 	var keys []Key
 
+	var runs int
+
 	for i = 0; i < len(in); i++ {
-		if in[i] == 0x08 || in[i] == 0x7F {
-			keys = append(keys, Key{KeySpecial, SpecialBackspace, utf8.RuneError})
-		} else if in[i] == 0x0D {
-			keys = append(keys, Key{KeySpecial, SpecialEnter, utf8.RuneError})
-		} else if in[i] >= 0x01 && in[i] <= 0x1A {
+		runs++
+		if runs > 10000 {
+			panic("endless loop")
+		}
+		if in[i] >= 0x01 && in[i] <= 0x1A {
 			// C-key / C-Key:
-			r, n = utf8.DecodeRune(in[1:])
-			i += n
+			// FIXME
 			keys = append(keys, Key{KeyLetter, ModCtrl, r})
 		} else if in[i] == 0x1B {
-			i++
-			if in[i] >= 0x41 && in[i] <= 0x5A || in[i] >= 0x61 && in[i] <= 0x7A {
-				// A-Key / A-key:
-				r, n = utf8.DecodeRune(in[1:])
+			if (in[i+1] >= 0x41 && in[i+1] <= 0x5A) || (in[i+1] >= 0x61 && in[i+1] <= 0x7A) {
+				// A-Key / A-key: decode remaining characters using utf8 library
+				r, n = utf8.DecodeRune(in[i+1:])
 				i += n - 1
 				keys = append(keys, Key{KeyLetter, ModAlt, r})
-			} else if in[i] == 0x4F {
-				keys = append(keys, Key{KeySpecial, SpecialF1, utf8.RuneError})
+			} else {
+				key, n = p.s.ParseFirst(in[i+1:])
+				i += n - 1
+				keys = append(keys, key)
 			}
 		} else {
-			r, n = utf8.DecodeRune(in[1:])
+			r, n = utf8.DecodeRune(in[i+1:])
 			i += n - 1
 			keys = append(keys, Key{KeyLetter, 0, r})
 		}
