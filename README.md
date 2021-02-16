@@ -35,3 +35,26 @@ From what I can tell, darwin is just BSD with a fancy-pants Kernel so it should 
 
  - The new `sys` package isn't available (yet?) for Plan9, so there will be no Plan9 support for now
  - Solaris licensing is weird at the moment, so there will be no Solaris support
+
+Interpreting byte sequences
+---------------------------
+
+In cooked I/O mode, the parent process preprocesses user input and post-processes program output.
+If e. g. the user presses the backspace key, the last character is removed.
+Only the full line is transmitted as a single string once the user presses enter.
+
+In raw I/O mode, all key presses are directly transferred to the developer.
+Every call to Terminal.Read() yields a byte sequence that corresponds to one or more keypresses (buffered I/O).
+
+This has the advantage that the client application does not have to wait for the user to press enter.
+However, the client application has to, in turn, interpret the raw byte sequences. For this purpose, the library `utf8` has been created.
+
+The method `utf8.ParseUTF8()` takes a sequence of bytes (doesn't matter if there's a single or multiple keys in it) and transforms those keys into an array of high-level data while keeping all information.
+
+Currently, the `ParseUTF8()` method supports parsing these character sets:
+ - "Action Keys" (0x00 - 0x1f, 0x7f)
+ - Basic Latin (0x20 - 0x7e)
+ - Symbols (codes starting with 0xc2)
+ - Basic umlauts (codes starting with 0xc3)
+
+Support for parsing escape sequences (cursor keys, F keys, ...) will soon be introduced.
