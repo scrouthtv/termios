@@ -26,7 +26,7 @@ As an example, `basic_test.go` is provided. When called, it expects the user to
 3) again inputting a line and pressing enter (reverting to cooked mode)
 
 The demo has been tested under
- - Windows/amd64 10
+ - Windows/amd64 10, Windows 7 might not be working at all, since the console modes changed somewhere along the way of Windows 10
  - Linux/amd64 5.4 and linux/arm 5.4
  - FreeBsd/amd64 12.2, OpenBSD/amd64 6.8, NetBSD/amd64 5.8, DragonFly/amd64 5.8.3
 
@@ -47,14 +47,22 @@ In raw I/O mode, all key presses are directly transferred to the developer.
 Every call to Terminal.Read() yields a byte sequence that corresponds to one or more keypresses (buffered I/O).
 
 This has the advantage that the client application does not have to wait for the user to press enter.
-However, the client application has to, in turn, interpret the raw byte sequences. For this purpose, the library `utf8` has been created.
+However, the client application has to, in turn, interpret the raw byte sequences. For this purpose, the library `keys` has been created.
 
-The method `utf8.ParseUTF8()` takes a sequence of bytes (doesn't matter if there's a single or multiple keys in it) and transforms those keys into an array of high-level data while keeping all information.
+The method `keys.ParseKeys()` takes a sequence of bytes (doesn't matter if there's a single or multiple keys in it) and transforms those keys into an array of high-level data while keeping all information.
 
-Since v2.1, the utf8 parser has been reworked to make use of Go's runes.
-Every key has a
+Since v2.1, the key parser has been reworked to parse normal letters using Go's runes and escape codes using termcap on Unix (local database or built-in backup) and using a built-in table on Windows.
+Every pressed key has a
  - Type: either KeyLetter or KeySpecial
  - Modifier: for KeyLetter optionally ModCtrl or ModAlt, for KeySpecial one of Special\*
  - Value: for KeyLetter the full rune
 
 Support for parsing escape sequences (cursor keys, F keys, ...) will soon be introduced.
+
+Random things
+-------------
+
+Print all values for a capability for different terminals:
+```
+ ~ find /usr/share/terminfo/* -type f -printf "%f\n" | xargs -I {} infocmp {} | grep -oE "kf1=[^,]*," | sort -u
+```

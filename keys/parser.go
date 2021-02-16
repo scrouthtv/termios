@@ -44,11 +44,14 @@ func ParseUTF8(in []byte) []Key {
 			i += n
 			keys = append(keys, Key{KeyLetter, ModCtrl, r})
 		} else if in[i] == 0x1B {
+			i++
 			if in[i] >= 0x41 && in[i] <= 0x5A || in[i] >= 0x61 && in[i] <= 0x7A {
 				// A-Key / A-key:
 				r, n = utf8.DecodeRune(in[1:])
-				i += n
+				i += n - 1
 				keys = append(keys, Key{KeyLetter, ModAlt, r})
+			} else if in[i] == 0x4F {
+				keys = append(keys, Key{KeySpecial, SpecialF1, utf8.RuneError})
 			}
 		} else {
 			r, n = utf8.DecodeRune(in[1:])
