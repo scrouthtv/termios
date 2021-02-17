@@ -1,6 +1,7 @@
 package keys
 
 import "unicode/utf8"
+import "fmt"
 
 type Parser struct {
 	s specialParser
@@ -9,7 +10,7 @@ type Parser struct {
 type specialParser interface {
 	// ParseFirst is expected to read and return the first escape sequence and its length
 	// If an error occurs, the implementation shall return InvalidKey and 1
-	ParseFirst([]byte) (Key, int)
+	ParseFirst([]byte) (int, int)
 }
 
 type Key struct {
@@ -52,18 +53,16 @@ func Init() (*Parser, error) {
 
 // ParseUTF8 splits the inputted bytes into logical keypresses
 func (p *Parser) ParseUTF8(in []byte) []Key {
-	var i, n int
+	var i, j, n int
 	var r rune
-	var key Key
 	var keys []Key
 
 	var runs int
 
-	for i = 0; i < len(in); i++ {
+	i = 0
+	for i < len(in) {
+		fmt.Printf("Parsing letter @ %d/%d: %X\n", i, len(in), in[i])
 		runs++
-		if runs > 10000 {
-			panic("endless loop")
-		}
 		if in[i] >= 0x01 && in[i] <= 0x1A {
 			// C-key / C-Key:
 			// FIXME
@@ -72,16 +71,18 @@ func (p *Parser) ParseUTF8(in []byte) []Key {
 			if (in[i+1] >= 0x41 && in[i+1] <= 0x5A) || (in[i+1] >= 0x61 && in[i+1] <= 0x7A) {
 				// A-Key / A-key: decode remaining characters using utf8 library
 				r, n = utf8.DecodeRune(in[i+1:])
-				i += n - 1
+				i += n
 				keys = append(keys, Key{KeyLetter, ModAlt, r})
 			} else {
-				key, n = p.s.ParseFirst(in[i+1:])
-				i += n - 1
-				keys = append(keys, key)
+				j, n = p.s.ParseFirst(in[i:])
+				fmt.Printf("Adding %d to i\n", n)
+				i += n
+				keys = append(keys, Key{KeySpecial, byte(j), utf8.RuneError})
 			}
 		} else {
-			r, n = utf8.DecodeRune(in[i+1:])
-			i += n - 1
+			r, n = utf8.DecodeRune(in[i:])
+			i += n
+			fmt.Printf("Adding %d to i\n", n)
 			keys = append(keys, Key{KeyLetter, 0, r})
 		}
 	}

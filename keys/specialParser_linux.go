@@ -2,79 +2,103 @@
 
 package keys
 
-import "unicode/utf8"
-
-import "github.com/xo/terminfo"
+import (
+	"fmt"
+	"unicode/utf8"
+)
 
 type linuxParser struct {
-	shortCaps map[string][]byte
+	specialKeys map[int][][]byte
 }
 
 func newSpecialParser() (*linuxParser, error) {
-	var info *terminfo.Terminfo
-	var err error
-	info, err = terminfo.LoadFromEnv()
-	if err != nil {
-		return nil, err
-	}
-	return &linuxParser{info.StringCapsShort()}, nil
+
+	// Maps a special key to all possible representations:
+	var specialKeys map[int][][]byte = make(map[int][][]byte)
+
+	// Since the terminfo files are simply wrong,
+	// I'll be using hardcoded values.
+	// All values must be tested with linux, screen, xterm, urxvt, termite, eterm
+
+	// TODO: some of these are prefixes of another?
+
+	// FIXME screen: backspace, f5
+	// FIXME urxvt: f1 - f5, home, end, backspace
+	// FIXME xterm: backspace, f5
+	// FIXME termite: backspace, f5
+	// FIXME eterm: f1 - f5, home, end, backspace
+
+	specialKeys[SpecialEnter] = [][]byte{[]byte{0x0D}}
+	specialKeys[SpecialBackspace] = [][]byte{[]byte{0x7f}, []byte{0x08}}
+
+	specialKeys[SpecialArrowDown] = [][]byte{[]byte{0x1b, 0x5b, 0x41}}
+	specialKeys[SpecialArrowUp] = [][]byte{[]byte{0x1b, 0x5b, 0x42}}
+	specialKeys[SpecialArrowRight] = [][]byte{[]byte{0x1b, 0x5b, 0x43}}
+	specialKeys[SpecialArrowLeft] = [][]byte{[]byte{0x1b, 0x5b, 0x44}}
+	specialKeys[SpecialDelete] = [][]byte{[]byte{0x1b, 0x5b, 0x33, 0x7e}}
+	specialKeys[SpecialHome] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x7e}, // linux, screen
+		[]byte{0x1b, 0x5b, 0x37, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x5b, 0x48}}       // xterm, termite
+	specialKeys[SpecialEnd] = [][]byte{[]byte{0x1b, 0x5b, 0x34, 0x7e}, // linux, screen
+		[]byte{0x1b, 0x5b, 0x38, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x5b, 0x46}}       // xterm, termite
+	specialKeys[SpecialPgUp] = [][]byte{[]byte{0x1b, 0x5b, 0x35, 0x7e}}
+	specialKeys[SpecialPgDown] = [][]byte{[]byte{0x1b, 0x5b, 0x36, 0x7e}}
+	specialKeys[SpecialIns] = [][]byte{[]byte{0x1b, 0x5b, 0x32, 0x7e}}
+
+	specialKeys[SpecialF1] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x41}, // linux
+		[]byte{0x1b, 0x5b, 0x31, 0x31, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x4f, 0x50}}             // xterm, screen, termite
+	specialKeys[SpecialF2] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x42}, // linux
+		[]byte{0x1b, 0x5b, 0x31, 0x32, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x4f, 0x51}}             // xterm, screen, termite
+	specialKeys[SpecialF3] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x43}, // linux
+		[]byte{0x1b, 0x5b, 0x31, 0x33, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x4f, 0x52}}             // xterm, screen, termite
+	specialKeys[SpecialF4] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x44}, // linux
+		[]byte{0x1b, 0x5b, 0x31, 0x34, 0x7e}, // urxvt, eterm
+		[]byte{0x1b, 0x4f, 0x53}}             // xterm, screen, termite
+
+	// Brain damage big times ahead: Starting from F5, every terminal works like xterm.
+	// Also there's a jump in between F5 and F6.
+	specialKeys[SpecialF5] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x45}, // linux
+		[]byte{0x1b, 0x5b, 0x31, 0x35, 0x7e}}
+	specialKeys[SpecialF6] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x37, 0x7e}}
+	specialKeys[SpecialF7] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x38, 0x7e}}
+	specialKeys[SpecialF8] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x39, 0x7e}}
+
+	// Mind the gap?
+	specialKeys[SpecialF9] = [][]byte{[]byte{0x1b, 0x5b, 0x32, 0x30, 0x7e}}
+	specialKeys[SpecialF10] = [][]byte{[]byte{0x1b, 0x5b, 0x32, 0x31, 0x7e}}
+	specialKeys[SpecialF11] = [][]byte{[]byte{0x1b, 0x5b, 0x32, 0x33, 0x7e}}
+	specialKeys[SpecialF12] = [][]byte{[]byte{0x1b, 0x5b, 0x32, 0x34, 0x7e}}
+
+	return &linuxParser{specialKeys}, nil
 }
 
 func specialKeyFromSpecial(special byte) Key {
 	return Key{KeySpecial, special, utf8.RuneError}
 }
 
-func (l *linuxParser) ParseFirst(in []byte) (Key, int) {
-
-	// some basic constants:
-	if in[0] == 0x7F {
-		return specialKeyFromSpecial(SpecialBackspace), 1
-	} else if in[0] == 0x0D {
-		return specialKeyFromSpecial(SpecialEnter), 1
-	}
-
-	var shortCap string
-	var length int
-	shortCap, length = l.getCap(in)
-	switch shortCap {
-	case "kbs":
-		return specialKeyFromSpecial(SpecialBackspace), length
-	case "kdch1":
-		return specialKeyFromSpecial(SpecialDelete), length
-	case "kcub1":
-		return specialKeyFromSpecial(SpecialArrowLeft), length
-	case "kcuf1":
-		return specialKeyFromSpecial(SpecialArrowRight), length
-	case "kcuu1":
-		return specialKeyFromSpecial(SpecialArrowUp), length
-	case "kcud1":
-		return specialKeyFromSpecial(SpecialArrowDown), length
-	case "khome":
-		return specialKeyFromSpecial(SpecialHome), length
-	case "kend":
-		return specialKeyFromSpecial(SpecialEnd), length
-	default:
-		return InvalidKey, 1
-	}
-}
-
-func (l *linuxParser) getCap(in []byte) (string, int) {
-	var shortCap string
-	var content []byte
+func (l *linuxParser) ParseFirst(in []byte) (int, int) {
+	var k int
+	var reps [][]byte
+	var rep []byte
 	var i int
 
-	nextCap:
-	for shortCap, content = range l.shortCaps {
-		if len(in) < len(content) {
-			continue
-		} else {
-			for i = 0; i < len(content); i++ {
-				if in[i] != content[i] {
-					continue nextCap
+nextCap:
+	for k, reps = range l.specialKeys {
+		for _, rep = range reps {
+			if len(in) >= len(rep) {
+				for i = 0; i < len(rep); i++ {
+					if in[i] != rep[i] {
+						continue nextCap
+					}
 				}
+				return k, len(rep)
 			}
-			return shortCap, len(content)
 		}
 	}
-	return "", 0
+	fmt.Println("No applicable sequence found")
+	return -1, 1
 }
