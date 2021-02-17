@@ -29,8 +29,8 @@ func TestInput(t *testing.T) {
 	for buf[0] != 'q' {
 		n, _ = term.Read(buf)
 		id, _ := p.ParseFirst(buf[:n])
-		if id > 0 {
-			os.Stdout.Write([]byte(specialNames[id] + "\n"))
+		if id >= 0 {
+			os.Stdout.Write([]byte(specialNames[id] + "\r\n"))
 		}
 	}
 

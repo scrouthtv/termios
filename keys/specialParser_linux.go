@@ -20,19 +20,11 @@ func newSpecialParser() (*linuxParser, error) {
 	// I'll be using hardcoded values.
 	// All values must be tested with linux, screen, xterm, urxvt, termite, eterm
 
-	// TODO: some of these are prefixes of another?
-
-	// FIXME screen: backspace, f5
-	// FIXME urxvt: f1 - f5, home, end, backspace
-	// FIXME xterm: backspace, f5
-	// FIXME termite: backspace, f5
-	// FIXME eterm: f1 - f5, home, end, backspace
-
 	specialKeys[SpecialEnter] = [][]byte{[]byte{0x0D}}
 	specialKeys[SpecialBackspace] = [][]byte{[]byte{0x7f}, []byte{0x08}}
 
-	specialKeys[SpecialArrowDown] = [][]byte{[]byte{0x1b, 0x5b, 0x41}}
-	specialKeys[SpecialArrowUp] = [][]byte{[]byte{0x1b, 0x5b, 0x42}}
+	specialKeys[SpecialArrowUp] = [][]byte{[]byte{0x1b, 0x5b, 0x41}}
+	specialKeys[SpecialArrowDown] = [][]byte{[]byte{0x1b, 0x5b, 0x42}}
 	specialKeys[SpecialArrowRight] = [][]byte{[]byte{0x1b, 0x5b, 0x43}}
 	specialKeys[SpecialArrowLeft] = [][]byte{[]byte{0x1b, 0x5b, 0x44}}
 	specialKeys[SpecialDelete] = [][]byte{[]byte{0x1b, 0x5b, 0x33, 0x7e}}
@@ -62,7 +54,7 @@ func newSpecialParser() (*linuxParser, error) {
 	// Brain damage big times ahead: Starting from F5, every terminal works like xterm.
 	// Also there's a jump in between F5 and F6.
 	specialKeys[SpecialF5] = [][]byte{[]byte{0x1b, 0x5b, 0x5b, 0x45}, // linux
-		[]byte{0x1b, 0x5b, 0x31, 0x35, 0x7e}}
+		[]byte{0x1b, 0x5b, 0x31, 0x35, 0x7e}} // xterm, screen, termite
 	specialKeys[SpecialF6] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x37, 0x7e}}
 	specialKeys[SpecialF7] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x38, 0x7e}}
 	specialKeys[SpecialF8] = [][]byte{[]byte{0x1b, 0x5b, 0x31, 0x39, 0x7e}}
@@ -86,8 +78,8 @@ func (l *linuxParser) ParseFirst(in []byte) (int, int) {
 	var rep []byte
 	var i int
 
-nextCap:
 	for k, reps = range l.specialKeys {
+nextCap:
 		for _, rep = range reps {
 			if len(in) >= len(rep) {
 				for i = 0; i < len(rep); i++ {
