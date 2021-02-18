@@ -21,7 +21,7 @@ func TestInput(t *testing.T) {
 
 	p, err := newSpecialParser()
 
-	os.Stdout.Write([]byte("q to exit\n"))
+	term.Write([]byte("q to exit\n"))
 
 	var n int
 
@@ -30,7 +30,7 @@ func TestInput(t *testing.T) {
 		n, _ = term.Read(buf)
 		id, _ := p.ParseFirst(buf[:n])
 		if id >= 0 {
-			os.Stdout.Write([]byte(specialNames[id] + "\r\n"))
+			term.Write([]byte(specialNames[id] + "\r\n"))
 		}
 	}
 

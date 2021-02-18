@@ -1,6 +1,10 @@
 github.com/scrouthtv/termios v0.0.0-20210216125743-1b0887406147 h1:Gutzu/LjU9SMBs1LyZqGL/i9LCCx7cmDiC2pAaq9vZM=
 github.com/scrouthtv/termios v0.0.0-20210216125743-1b0887406147/go.mod h1:smp1vVRZ1Piw3IZsR8UBEfV7gSQPlhSB/J/w+6TsfMw=
-github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
-github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
+github.com/scrouthtv/termios v0.0.0-20210218162700-bd852f40d86b h1:aAY0A+On8oR7WaMuJw0jGMSHZPv2B2mMh9NHLs1zipk=
+github.com/scrouthtv/termios v0.0.0-20210218162700-bd852f40d86b/go.mod h1:smp1vVRZ1Piw3IZsR8UBEfV7gSQPlhSB/J/w+6TsfMw=
+github.com/scrouthtv/termios v0.0.0-20210218174220-38b76925d948 h1:c6riIK/8K6vK08ZfaE0Q7CcZD1KmQrHoDzAvnaQEvr4=
+github.com/scrouthtv/termios v0.0.0-20210218174220-38b76925d948/go.mod h1:smp1vVRZ1Piw3IZsR8UBEfV7gSQPlhSB/J/w+6TsfMw=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c h1:VwygUrnw9jn88c4u8GD3rZQbqrP/tgas88tPUbBxQrk=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b h1:lAZ0/chPUDWwjqosYR0X4M490zQhMsiJ4K3DbA7o+3g=
+golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

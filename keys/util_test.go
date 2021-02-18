@@ -33,18 +33,20 @@ func TestDumpKeys(t *testing.T) {
 	var buf []byte = make([]byte, 1024)
 	var b byte
 	var s string
-	os.Stdout.Write([]byte(fmt.Sprintf(" #  hex binary  decimal string\r\n")))
+	term.Write([]byte(fmt.Sprintf(" #  hex binary  decimal string\r\n")))
+	fmt.Printf("asdf\r\n")
+	fmt.Println("qwertz")
 
 	for {
 		n, err = term.Read(buf)
 		for i = 0; i < n; i++ {
 			if buf[i] == 0x04 {
 				term.Close()
-				os.Exit(0)
+				return
 			}
 			b = buf[i]
-			s = fmt.Sprintf("%03d %03X %08b %04d %q\r\n", i, b, b, b, b)
-			os.Stdout.Write([]byte(s))
+			s = fmt.Sprintf("%03d %03X %08b %04d %q\n\r", i, b, b, b, b)
+			term.Write([]byte(s))
 		}
 	}
 }

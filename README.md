@@ -1,6 +1,26 @@
 goterm
 ======
 
+Construction In Progress
+------------------------
+
+I originally adopted this library from `creack` on GitHub. The original project had to functions: setting / reading terminal size and (un-) setting raw mode.
+
+Because of the current work over at `RythenGlyth/gosh`, we needed an API that abstracts away all OS-individual raw I/O things.
+
+This library currently can:
+ - (Un-) Set Raw mode (every single keypress is sent to the application instead of only full lines)
+ - Parse a limited set of input sequences on a limited number of terminals (currently only Linux)
+
+What is tbd:
+ - [ ] Special Key Input on Windows. Because I want to implement everything using GO APIs and not the deprecated `syscall` API, I'm currently waiting on response on an issue: https://github.com/golang/go/issues/44373. The new `x/sys/windows` API can currently only read character keys in raw mode.
+ - [ ] Parsing input sequences on Windows.
+ - [ ] Take another look at terminfo files. I trashed them during development because they're so many wrong and missing entries in every single terminfo file. Instead, I created my own built-in table which should be able to parse input on any sane terminal. Terminfo might nevertheless still be needed for writing escape sequences (movement, screen clear, ...)
+ - [ ] Put everything together into a single, easy-to-use API.
+
+termios
+-------
+
 This is a complete rework of creak's original termios.
 
 I rewrote the code to provide this functionality:
