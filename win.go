@@ -96,8 +96,8 @@ func (t *winTerm) SetRaw(raw bool) error {
 	// see https://docs.microsoft.com/en-us/windows/console/high-level-console-modes
 
 	if raw {
-		inMode &^= windows.ENABLE_PROCESSED_INPUT | windows.ENABLE_LINE_INPUT | windows.ENABLE_ECHO_INPUT
-		outMode &^= windows.ENABLE_PROCESSED_OUTPUT | windows.ENABLE_WRAP_AT_EOL_OUTPUT
+		inMode = windows.ENABLE_WINDOW_INPUT
+		outMode = windows.ENABLE_PROCESSED_OUTPUT // this is needed so that new line works??????
 	} else {
 		inMode = t.oldInMode
 		outMode = t.oldOutMode
