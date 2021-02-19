@@ -2,15 +2,13 @@
 
 package keys
 
-import "unicode/utf8"
-
 type winParser struct {}
 
 func newSpecialParser() (*winParser, error) {
 	return &winParser{}, nil
 }
 
-func (w *winParser) ParseFirst([]byte) (Key, int) {
+func (w *winParser) ParseFirst([]byte) (int, int) {
 	// TODO
-	return Key{KeyInvalid, 0, utf8.RuneError}, 1
+	return 0, 0
 }
