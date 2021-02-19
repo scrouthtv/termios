@@ -7,16 +7,23 @@ import (
 )
 
 type winTerm struct {
-	in windows.Handle
-	out windows.Handle
-	ready bool
-	isRaw bool
-	oldInMode uint32
+	in         windows.Handle
+	out        windows.Handle
+	ready      bool
+	isRaw      bool
+	oldInMode  uint32
 	oldOutMode uint32
+	p          *winParser
 }
 
-func Open() (*winTerm, error) {
+func Open() (Terminal, error) {
 	var err error
+
+	var p *winParser
+	p, err = newParser()
+	if err != nil {
+		return nil, err
+	}
 
 	var in, out windows.Handle
 	in, err = windows.Open("CONIN$", windows.O_RDWR, 0)
@@ -45,7 +52,7 @@ func Open() (*winTerm, error) {
 		return nil, err
 	}
 
-	var t winTerm = winTerm{in, out, true, false, inMode, outMode}
+	var t winTerm = winTerm{in, out, true, false, inMode, outMode, p}
 
 	return &t, nil
 }
@@ -58,8 +65,24 @@ func (t *winTerm) IsRaw() bool {
 	return t.isRaw
 }
 
-func (t *winTerm) Read(p []byte) (int, error) {
-	return windows.Read(t.in, p)
+func (t *winTerm) Read() ([]Key, error) {
+	var iR InputRecord
+	var err error
+	var read uint32
+	var k *Key
+
+	// wait for the first valid input:
+	for k == nil {
+		err = ReadConsoleInput(t.in, &iR, 1, &read)
+		if err != nil {
+			return nil, err
+		}
+		k = t.p.asKey(iR)
+	}
+
+	windows.Write(t.out, []byte(iR.String()))
+
+	return []Key{*t.p.asKey(iR)}, nil
 }
 
 func (t *winTerm) Write(p []byte) (int, error) {
