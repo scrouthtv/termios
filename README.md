@@ -22,11 +22,11 @@ The key parsing API supports these keys on all supported terminals:
  - C-[a-z]
  - A-letter, A-Letter, A-symbol
  - F1 through F12, C-Fx, A-Fx
- - Special keys: Delete, Backspace, Home, End, PgUp, PgDown, Arrow Keys
+ - Special keys: Delete, Backspace, Enter, Insert, Home, End, PgUp, PgDown, Arrow Keys
  - C-Special
  - A-Special
 
-C-A-anything is *explicitely* not supported
+C-A-key is *explicitely* not supported and will always be replaced by key.
 
 Supported terminals
 -------------------
@@ -35,12 +35,15 @@ Supported terminals
     * Windows Terminal >= 1.6
     * ConHost >= Windows 7
     * Cmder >= 191012
+    * ConEmu >= 210206
 
 Known issues
 ------------
 
- - Windows: A-F1 through A-F12 and A-arrow are not send
+ - Windows: A-F1 through A-F12, A-arrow, A-enter, A-escape, A-tab are not send
+ - Windows/Terminal does not send A-Enter, F11 by default (bound to fullscreen), does not send C-Tab
  - Windows/Cmder does not send C-ArrowUp, C-ArrowDown
+ - Windows/ConEmu does not send C-PgUp, C-PgDown by default (bound to scroll up / down)
 
 termios
 -------

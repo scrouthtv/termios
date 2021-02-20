@@ -24,8 +24,7 @@ func init() {
 	// Same with vkCancel and vkClear
 	// If you own a keyboard with these keys feel free to @ me
 	vkCodes[0x08] = SpecialBackspace
-	vkCodes[0x2E] = SpecialDelete
-	vkCodes[0x09] = SpecialTab
+	vkCodes[0x9] = SpecialTab
 	vkCodes[0x0d] = SpecialEnter
 	vkCodes[0x1b] = SpecialEscape
 	vkCodes[0x21] = SpecialPgUp
@@ -36,6 +35,8 @@ func init() {
 	vkCodes[0x26] = SpecialArrowUp
 	vkCodes[0x27] = SpecialArrowRight
 	vkCodes[0x28] = SpecialArrowDown
+	vkCodes[0x2d] = SpecialIns
+	vkCodes[0x2e] = SpecialDelete
 
 	vkCodes[0x70] = SpecialF1
 	vkCodes[0x71] = SpecialF2
@@ -73,13 +74,16 @@ func (p *winParser) asKey(i InputRecord) *Key {
 
 	// First some random stuff that does not work out of the box:
 	if i.Data[4] == 0x08 && i.Data[5] == 0x0e {
-		return &Key{KeySpecial, mods, SpecialBackspace}
+		return &Key{KeySpecial, mods, SpecialBackspace} // overlaps with C-h
 	}
 	if i.Data[4] == 0x0d && i.Data[5] == 0x1c {
-		return &Key{KeySpecial, mods, SpecialEnter}
+		return &Key{KeySpecial, mods, SpecialEnter} // overlaps with C-m
+	}
+	if i.Data[4] == 0x09 && i.Data[5] == 0x0f {
+		return &Key{KeySpecial, mods, SpecialTab} // overlaps with C-i
 	}
 
-	if i.Data[6] >= 0x01 && i.Data[6] <= 0x1A {
+	if i.Data[6] >= 0x01 && i.Data[6] <= 0x1a {
 		// C-key
 		var r rune = rune(i.Data[6]-0x01) + 'a'
 		return &Key{KeyLetter, ModCtrl, r}
@@ -91,13 +95,15 @@ func (p *winParser) asKey(i InputRecord) *Key {
 		return &Key{KeySpecial, mods, rune(special)}
 	}
 
+	// Because some things are inputted with C-A-*:
+	if mods == ModCtrl|ModAlt {
+		mods = 0
+	}
+
 	// here we use the unicode codepoint which is at position 6:
 	var r rune = rune(i.Data[6])
 
 	if unicode.IsGraphic(r) {
-		if mods == ModCtrl|ModAlt {
-			mods = 0
-		}
 		return &Key{KeyLetter, mods, r}
 	}
 
