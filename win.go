@@ -77,16 +77,17 @@ func (t *winTerm) Read() ([]Key, error) {
 		if err != nil {
 			return nil, err
 		}
+		windows.Write(t.out, []byte(iR.String()))
 		k = t.p.asKey(iR)
 	}
-
-	windows.Write(t.out, []byte(iR.String()))
 
 	return []Key{*t.p.asKey(iR)}, nil
 }
 
-func (t *winTerm) Write(p []byte) (int, error) {
-	return windows.Write(t.out, p)
+func (t *winTerm) Write(p string) (int, error) {
+	ae := 'ä'
+	windows.Write(t.out, []byte(string(ae)))
+	return windows.Write(t.out, []byte(p))
 }
 
 func (t *winTerm) Close() {

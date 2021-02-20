@@ -24,7 +24,7 @@ func TestBasicOpen(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		_, err = term.Write([]byte(buf[0].String() + "\r\n"))
+		_, err = term.Write(buf[0].String() + "\r\n")
 		if err != nil {
 			t.Error(err)
 		}
