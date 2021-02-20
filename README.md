@@ -26,18 +26,21 @@ The key parsing API supports these keys on all supported terminals:
  - C-Special
  - A-Special
 
+C-A-anything is *explicitely* not supported
+
 Supported terminals
 -------------------
 
  - Windows:
     * Windows Terminal >= 1.6
     * ConHost >= Windows 7
+    * Cmder >= 191012
 
 Known issues
 ------------
 
- - Windows: Depending on the Keyboard Layout, characters will be sent in the way they're typed, e. g. on German keyboards, ~ and | is typed as C-A-+ and C-A-< and will be sent as C-A-~ and C-A-|
  - Windows: A-F1 through A-F12 and A-arrow are not send
+ - Windows/Cmder does not send C-ArrowUp, C-ArrowDown
 
 termios
 -------

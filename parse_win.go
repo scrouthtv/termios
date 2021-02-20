@@ -95,6 +95,9 @@ func (p *winParser) asKey(i InputRecord) *Key {
 	var r rune = rune(i.Data[6])
 
 	if unicode.IsGraphic(r) {
+		if mods == ModCtrl|ModAlt {
+			mods = 0
+		}
 		return &Key{KeyLetter, mods, r}
 	}
 
