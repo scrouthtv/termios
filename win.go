@@ -85,9 +85,17 @@ func (t *winTerm) Read() ([]Key, error) {
 }
 
 func (t *winTerm) Write(p string) (int, error) {
-	ae := 'ä'
-	windows.Write(t.out, []byte(string(ae)))
-	return windows.Write(t.out, []byte(p))
+	var written uint32 = 0
+	var err error
+	var rs []rune = []rune(p)
+	var code []uint16 = make([]uint16, len(rs))
+
+	for i, r := range rs {
+		code[i] = uint16(r)
+	}
+
+	err = windows.WriteConsole(t.out, &code[0], uint32(len(rs)), &written, nil)
+	return int(written), err
 }
 
 func (t *winTerm) Close() {

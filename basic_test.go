@@ -1,6 +1,10 @@
 package termios
 
-import "testing"
+import (
+	"testing"
+
+	"golang.org/x/sys/windows"
+)
 
 func TestBasicOpen(t *testing.T) {
 	var term Terminal
@@ -35,4 +39,30 @@ func TestBasicOpen(t *testing.T) {
 	}
 
 	term.Close()
+}
+
+func TestUmls(t *testing.T) {
+	term, err := Open()
+	if err != nil {
+		t.Error(err)
+	}
+
+	vT := term.(*winTerm)
+
+	term.SetRaw(true)
+
+	var s string = "aäoöÜ"
+	var rs []rune = []rune(s)
+	var text []uint16 = make([]uint16, len(rs))
+
+	for i, r := range rs {
+		text[i] = uint16(r)
+	}
+
+	var written uint32 = 0
+
+	err = windows.WriteConsole(vT.out, &text[0], 5, &written, nil)
+	if err != nil {
+		t.Error(err)
+	}
 }

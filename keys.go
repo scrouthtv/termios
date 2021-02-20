@@ -43,7 +43,7 @@ func (k *Key) String() string {
 				s += " " + modNames[mod]
 			}
 		}
-		s += " " + string(rune(k.Value)) + " " + string(rune(0xe4))
+		s += " " + string(rune(k.Value))
 	} else if k.Type == KeySpecial {
 		s += " " + specialNames[k.Value]
 	}
