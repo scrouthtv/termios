@@ -61,35 +61,38 @@ func (p *winParser) asKey(i InputRecord) *Key {
 		return nil
 	}
 
+	var mods byte = 0
+
+	// Detecting modifiers:
+	if i.Data[7]&0b11 > 0 {
+		mods |= ModAlt
+	}
+	if i.Data[7]&0b1100 > 0 {
+		mods |= ModCtrl
+	}
+
+	// First some random stuff that does not work out of the box:
+	if i.Data[4] == 0x08 && i.Data[5] == 0x0e {
+		return &Key{KeySpecial, mods, SpecialBackspace}
+	}
+	if i.Data[4] == 0x0d && i.Data[5] == 0x1c {
+		return &Key{KeySpecial, mods, SpecialEnter}
+	}
+
 	if i.Data[6] >= 0x01 && i.Data[6] <= 0x1A {
 		// C-key
 		var r rune = rune(i.Data[6]-0x01) + 'a'
 		return &Key{KeyLetter, ModCtrl, r}
 	}
 
-	var mods byte = 0
-
-	if i.Data[0] == 0x0 {
-		// any input which does not have a corresponding Unicode code point:
-		//  - C-A-key
-	}
-
-	if i.Data[7]&0b11 > 0 {
-		mods |= ModAlt
-	}
-
-	if i.Data[7]&0b1100 > 0 {
-		mods |= ModCtrl
-	}
-
-	// here we use the unicode codepoint which is at position 6:
-	var r rune = rune(i.Data[6])
-
 	// here we use the virtual keyboard code which is at position 4:
 	special, ok := vkCodes[i.Data[4]]
 	if ok {
 		return &Key{KeySpecial, mods, rune(special)}
 	}
+
+	// here we use the unicode codepoint which is at position 6:
+	var r rune = rune(i.Data[6])
 
 	if unicode.IsGraphic(r) {
 		return &Key{KeyLetter, mods, r}

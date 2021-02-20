@@ -13,10 +13,31 @@ This library currently can:
  - Parse a limited set of input sequences on a limited number of terminals (currently only Linux)
 
 What is tbd:
- - [ ] Special Key Input on Windows. Because I want to implement everything using GO APIs and not the deprecated `syscall` API, I'm currently waiting on response on an issue: https://github.com/golang/go/issues/44373. The new `x/sys/windows` API can currently only read character keys in raw mode.
- - [ ] Parsing input sequences on Windows.
  - [ ] Take another look at terminfo files. I trashed them during development because they're so many wrong and missing entries in every single terminfo file. Instead, I created my own built-in table which should be able to parse input on any sane terminal. Terminfo might nevertheless still be needed for writing escape sequences (movement, screen clear, ...)
  - [ ] Put everything together into a single, easy-to-use API.
+
+The key parsing API supports these keys on all supported terminals:
+ - Letters: a-z, A-Z, 0-9, Extended Latin (U+0100 - U+FFFF)
+ - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ ` ´
+ - C-[a-z]
+ - A-letter, A-Letter, A-symbol
+ - F1 through F12, C-Fx, A-Fx
+ - Special keys: Delete, Backspace, Home, End, PgUp, PgDown, Arrow Keys
+ - C-Special
+ - A-Special
+
+Supported terminals
+-------------------
+
+ - Windows:
+    * Windows Terminal >= 1.6
+    * ConHost >= Windows 7
+
+Known issues
+------------
+
+ - Windows: Depending on the Keyboard Layout, characters will be sent in the way they're typed, e. g. on German keyboards, ~ and | is typed as C-A-+ and C-A-< and will be sent as C-A-~ and C-A-|
+ - Windows: A-F1 through A-F12 and A-arrow are not send
 
 termios
 -------
