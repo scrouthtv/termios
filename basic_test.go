@@ -2,8 +2,6 @@ package termios
 
 import (
 	"testing"
-
-	"golang.org/x/sys/windows"
 )
 
 func TestBasicOpen(t *testing.T) {
@@ -41,7 +39,8 @@ func TestBasicOpen(t *testing.T) {
 	term.Close()
 }
 
-func TestUmls(t *testing.T) {
+// FIXED in a3abd28:
+/*func TestUmls(t *testing.T) {
 	term, err := Open()
 	if err != nil {
 		t.Error(err)
@@ -65,4 +64,4 @@ func TestUmls(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
+}*/

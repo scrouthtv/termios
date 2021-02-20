@@ -37,12 +37,13 @@ var modNames []string = []string{"ctrl", "alt"}
 func (k *Key) String() string {
 	var s string = keyNames[k.Type] + ":"
 
-	if k.Type == KeyLetter {
-		for mod, i := range []byte{ModCtrl, ModAlt} {
-			if (k.Mod & i) != 0 {
-				s += " " + modNames[mod]
-			}
+	for mod, i := range []byte{ModCtrl, ModAlt} {
+		if (k.Mod & i) != 0 {
+			s += " " + modNames[mod]
 		}
+	}
+
+	if k.Type == KeyLetter {
 		s += " " + string(rune(k.Value))
 	} else if k.Type == KeySpecial {
 		s += " " + specialNames[k.Value]
