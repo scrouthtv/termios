@@ -6,16 +6,27 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+const ioBufSize int = 128
+
 type nixTerm struct {
-	in int
-	out int
-	ready bool
-	isRaw bool
+	in      int
+	out     int
+	ready   bool
+	isRaw   bool
 	oldMode unix.Termios
+	p       *linuxParser
+	inBuf   []byte
 }
 
-func Open() (*nixTerm, error) {
+// Open opens a new terminal for raw i/o
+func Open() (Terminal, error) {
 	var err error
+
+	var p *linuxParser
+	p, err = newParser()
+	if err != nil {
+		return nil, err
+	}
 
 	var in, out int
 
@@ -39,17 +50,23 @@ func Open() (*nixTerm, error) {
 		return nil, err
 	}
 
-	var t nixTerm = nixTerm{in, out, true, false, *mode}
+	var t nixTerm = nixTerm{in, out, true, false, *mode, p, make([]byte, ioBufSize)}
 
 	return &t, nil
 }
 
-func (t *nixTerm) Read(p []byte) (int, error) {
-	return unix.Read(t.in, p)
+func (t *nixTerm) Read() ([]Key, error) {
+	var err error
+	_, err = unix.Read(t.in, t.inBuf)
+	if err != nil {
+		return nil, err
+	} else {
+		return t.p.asKey(t.inBuf), nil
+	}
 }
 
-func (t *nixTerm) Write(p []byte) (int, error) {
-	return unix.Write(t.out, p)
+func (t *nixTerm) Write(s string) (int, error) {
+	return unix.Write(t.out, []byte(s))
 }
 
 func (t *nixTerm) IsOpen() bool {
