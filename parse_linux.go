@@ -44,11 +44,12 @@ func (p *linuxParser) asKey(in []byte) []Key {
 	var k Key
 	var r rune
 
-	// What already works:
+	// Here we look for:
 	//  - a-z, A-Z, 0-9, ext latin
 	//  - symbols
 	//  - C-[a-z], C-[A-Z]
-	//  -
+	//  - A-letter, A-Letter, A-symbol
+	// Special keys starting with x1b are delegated to the info implementation
 
 	os.Stdout.WriteString("Have to parse [ ")
 	for _, b := range in {

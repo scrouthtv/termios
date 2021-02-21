@@ -29,10 +29,17 @@ func loadTerminfo() (*info, error) {
 		i.specialKeys[Key{KeySpecial, 0, SpecialBackspace}] = caps["kbs"]
 		i.specialKeys[Key{KeySpecial, 0, SpecialDelete}] = caps["kdch1"]
 		i.specialKeys[Key{KeySpecial, 0, SpecialEnter}] = caps["kent"]
+
 		i.specialKeys[Key{KeySpecial, 0, SpecialArrowLeft}] = caps["kcub1"]
 		i.specialKeys[Key{KeySpecial, 0, SpecialArrowRight}] = caps["kcuf1"]
 		i.specialKeys[Key{KeySpecial, 0, SpecialArrowUp}] = caps["kcuu1"]
 		i.specialKeys[Key{KeySpecial, 0, SpecialArrowDown}] = caps["kcud1"]
+
+		i.specialKeys[Key{KeySpecial, 0, SpecialHome}] = caps["khome"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialEnd}] = caps["kend"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialPgUp}] = caps["kpp"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialPgDown}] = caps["knp"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialIns}] = caps["kich1"]
 
 		addKeys(&i.specialKeys)
 
@@ -47,7 +54,7 @@ func loadTerminfo() (*info, error) {
 			// If that works, return it:
 			return i, nil
 		} else {
-			// If not, return the earlier error
+			// If not (e. g. there is no built-in for this terminal), return the first error
 			return nil, err
 		}
 	}
