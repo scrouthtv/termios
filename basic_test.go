@@ -12,13 +12,6 @@ func TestBasicOpen(t *testing.T) {
 		t.Error(err)
 	}
 
-	// raw mode is technically not needed on Windows
-	err = term.SetRaw(true)
-	if err != nil {
-		t.Error(err)
-	}
-
-	//var buf []byte = make([]byte, 1024)
 	var buf []Key
 
 	for i := 0; i < 10; i++ {
@@ -32,10 +25,6 @@ func TestBasicOpen(t *testing.T) {
 				t.Error(err)
 			}
 		}
-	}
-	err = term.SetRaw(false)
-	if err != nil {
-		t.Error(err)
 	}
 
 	term.Close()

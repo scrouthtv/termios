@@ -1,7 +1,7 @@
 goterm
 ======
 
-I originally adopted this library from `creack` on GitHub. The original project had to functions: setting / reading terminal size and (un-) setting raw mode.
+I originally adopted this library from *creack* on GitHub. The original project had these functions: setting / reading terminal size and (un-) setting raw mode.
 
 The key parsing API supports these keys on all supported terminals:
  - Letters: a-z, A-Z, 0-9, Extended Latin (U+0100 - U+FFFF)
@@ -47,6 +47,8 @@ I rewrote the code to provide this functionality:
 
 If any of these functions fail during execution, we try to undo all changes to the point before calling.
 
+`Read()` and `Write()` will (try to) use the underlying devices, even if the terminal isn't opened (properly) or has already been closed. 
+
 This fork makes use of Go's new, platform-specific, syscall wrappers and all "unsafe" code was removed. The entire library is just a very thin wrapper around the new `x/sys` packages which (hopefully) uses the correct constants for the correct calls.
 
 For testing, `basic_test.go` is provided. When called, it prints every raw data the library reads and reads 10 recognized keystrokes from the user.
@@ -61,3 +63,13 @@ Every pressed key has a
  - Type: either KeyLetter or KeySpecial
  - Modifier: for KeyLetter optionally ModCtrl or ModAlt, for KeySpecial one of Special\*
  - Value: for KeyLetter the full rune
+
+ Implementation
+ --------------
+
+ `Terminal` is implemented by platform-specific terminal implementations (nixTerm, winTerm).
+ The implementation is responsible for opening and closing as well as reading and writing byte sequences.
+
+ Each read byte sequence is passed to an even more specific parser to be converted to a `[]Key`:
+  - On Windows, bytes are compared to a built-in table (see `parse_win.go`).
+  - On Linux, consoles that are compatible to `xterm`s advanced input mode (`altSendsEscape`) is parsed in `parse_xterm.go`. For other consoles, they are compared to either a terminfo file on the disk (`terminfo.go`) or a built-in terminfo table (see `terminfo_builtin.go`).

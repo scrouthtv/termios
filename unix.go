@@ -8,24 +8,24 @@ import (
 
 const ioBufSize int = 128
 
+type unixParser interface {
+	open()
+	close()
+	asKey(in []byte) []Key
+}
+
 type nixTerm struct {
 	in      int
 	out     int
 	ready   bool
 	oldMode unix.Termios
-	p       *linuxParser
+	p       unixParser
 	inBuf   []byte
 }
 
 // Open opens a new terminal for raw i/o
 func Open() (Terminal, error) {
 	var err error
-
-	var p *linuxParser
-	p, err = newParser()
-	if err != nil {
-		return nil, err
-	}
 
 	var in, out int
 
@@ -62,24 +62,30 @@ func Open() (Terminal, error) {
 	mode.Cc[unix.VTIME] = 0
 
 	// set raw termios:
-	err = unix.IoctlSetTermios(t.in, reqSetTermios, mode)
+	err = unix.IoctlSetTermios(in, reqSetTermios, mode)
 	if err != nil {
-		unix.Close(t.in)
-		unix.Close(t.out)
-		return err
+		unix.Close(in)
+		unix.Close(out)
+		return nil, err
 	}
-	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
+	err = unix.IoctlSetTermios(out, reqSetTermios, mode)
 	if err != nil {
-		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
-		unix.Close(t.in)
-		unix.Close(t.out)
-		return err
+		unix.IoctlSetTermios(in, reqSetTermios, mode)
+		unix.Close(in)
+		unix.Close(out)
+		return nil, err
 	}
 
-	// initialize:
-	unix.Write(t.out, t.p.formatSimpleAction(ActionInit))
+	var t nixTerm = nixTerm{in, out, true, oldMode, nil, make([]byte, ioBufSize)}
 
-	var t nixTerm = nixTerm{in, out, true, oldMode, p, make([]byte, ioBufSize)}
+	var p unixParser
+	p, err = newParser(&t)
+	if err != nil {
+		return nil, err
+	}
+	t.p = p
+
+	p.open()
 
 	return &t, nil
 }
@@ -106,7 +112,7 @@ func (t *nixTerm) IsOpen() bool {
 func (t *nixTerm) Close() {
 	t.ready = false
 
-	unix.Write(t.out, t.p.formatSimpleAction(ActionExit))
+	t.p.close()
 
 	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)
 	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode)

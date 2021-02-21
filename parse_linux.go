@@ -5,16 +5,32 @@ package termios
 import "os"
 import "fmt"
 
+// linuxParser is the default parser for linux terminals that should always work.
+// It compares 
 type linuxParser struct {
-	i *info
+	parent *nixTerm
+	i      *info
 }
 
-func newParser() (*linuxParser, error) {
+func newParser(parent *nixTerm) (unixParser, error) {
+	/*if os.Getenv("TERM") == "xterm" {
+		return &xtermParser{parent}, nil
+	}*/
+
 	i, err := loadTerminfo()
 	if err != nil {
 		return nil, err
 	}
-	return &linuxParser{i}, nil
+	return &linuxParser{parent, i}, nil
+}
+
+func (p *linuxParser) open() {
+	p.parent.Write(string(p.formatSimpleAction(ActionInit)))
+}
+
+func (p *linuxParser) close() {
+	// FIXME: reset to the mode we were in when we first started
+	p.parent.Write(string(p.formatSimpleAction(ActionExit)))
 }
 
 // ParseUTF8 splits the inputted bytes into logical keypresses
