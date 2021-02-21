@@ -23,10 +23,9 @@ The key parsing API supports these keys on all supported terminals:
  - A-letter, A-Letter, A-symbol
  - F1 through F12, C-Fx, A-Fx
  - Special keys: Delete, Backspace, Enter, Insert, Home, End, PgUp, PgDown, Arrow Keys
- - C-Special
- - A-Special
+ - C-Special, A-Special, S-Special, all combinations of these
 
-C-A-key is *explicitely* not supported and will always be replaced by key.
+For non-special keys, C-A-key is *explicitely* not supported and will always be replaced by key.
 
 Supported terminals
 -------------------
@@ -40,8 +39,8 @@ Supported terminals
 Known issues
 ------------
 
- - Windows: A-F1 through A-F12, A-arrow, A-enter, A-escape, A-tab are not send
- - Windows/Terminal does not send A-Enter, F11 by default (bound to fullscreen), does not send C-Tab
+ - Windows: A-F1 through A-F12, A-arrow, A-enter, A-escape, A-tab, C-A-Entf are not send
+ - Windows/Terminal does not send many keys becauseof default keybindings: A-Enter, F11, C-Tab, C-S-Tab, S-Ins
  - Windows/Cmder does not send C-ArrowUp, C-ArrowDown
  - Windows/ConEmu does not send C-PgUp, C-PgDown by default (bound to scroll up / down)
 

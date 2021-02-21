@@ -24,7 +24,7 @@ func init() {
 	// Same with vkCancel and vkClear
 	// If you own a keyboard with these keys feel free to @ me
 	vkCodes[0x08] = SpecialBackspace
-	vkCodes[0x9] = SpecialTab
+	vkCodes[0x09] = SpecialTab
 	vkCodes[0x0d] = SpecialEnter
 	vkCodes[0x1b] = SpecialEscape
 	vkCodes[0x21] = SpecialPgUp
@@ -74,12 +74,21 @@ func (p *winParser) asKey(i InputRecord) *Key {
 
 	// First some random stuff that does not work out of the box:
 	if i.Data[4] == 0x08 && i.Data[5] == 0x0e {
+		if i.Data[7]&0b10000 > 0 {
+			mods |= ModShift
+		}
 		return &Key{KeySpecial, mods, SpecialBackspace} // overlaps with C-h
 	}
 	if i.Data[4] == 0x0d && i.Data[5] == 0x1c {
+		if i.Data[7]&0b10000 > 0 {
+			mods |= ModShift
+		}
 		return &Key{KeySpecial, mods, SpecialEnter} // overlaps with C-m
 	}
 	if i.Data[4] == 0x09 && i.Data[5] == 0x0f {
+		if i.Data[7]&0b10000 > 0 {
+			mods |= ModShift
+		}
 		return &Key{KeySpecial, mods, SpecialTab} // overlaps with C-i
 	}
 
@@ -92,6 +101,9 @@ func (p *winParser) asKey(i InputRecord) *Key {
 	// here we use the virtual keyboard code which is at position 4:
 	special, ok := vkCodes[i.Data[4]]
 	if ok {
+		if i.Data[7]&0b10000 > 0 {
+			mods |= ModShift
+		}
 		return &Key{KeySpecial, mods, rune(special)}
 	}
 

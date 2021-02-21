@@ -29,15 +29,18 @@ const (
 	ModCtrl = (1 << iota)
 	// ModAlt is or'd to the modifier list if the alt key was pressed.
 	ModAlt
+	// ModShift is or'd to the modifier list if the shift key was pressed.
+	// It is only applicable for special keys.
+	ModShift
 )
 
 var keyNames []string = []string{"letter", "special", "invalid"}
-var modNames []string = []string{"ctrl", "alt"}
+var modNames []string = []string{"ctrl", "alt", "shift"}
 
 func (k *Key) String() string {
 	var s string = keyNames[k.Type] + ":"
 
-	for mod, i := range []byte{ModCtrl, ModAlt} {
+	for mod, i := range []byte{ModCtrl, ModAlt, ModShift} {
 		if (k.Mod & i) != 0 {
 			s += " " + modNames[mod]
 		}

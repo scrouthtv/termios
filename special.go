@@ -5,6 +5,7 @@ const (
 	SpecialBackspace = iota
 	// SpecialDelete is the key that deletes the character to the right of the cursor
 	SpecialDelete
+	// SpecialEnter is the enter / new-line key
 	SpecialEnter
 	SpecialArrowLeft
 	SpecialArrowRight
