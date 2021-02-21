@@ -6,7 +6,7 @@ I originally adopted this library from *creack* on GitHub. The original project 
 The key parsing API supports these keys on all supported terminals:
  - Letters: a-z, A-Z, 0-9, Extended Latin (U+0100 - U+FFFF)
  - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ ` ´
- - C-[a-z]
+ - C-[a-z], for C-[A-Z] the lower case variant C-[a-z] should be returned
  - A-letter, A-Letter, A-symbol
  - F1 through F12, C-Fx, A-Fx
  - Special keys: Delete, Backspace, Enter, Insert, Home, End, PgUp, PgDown, Arrow Keys
@@ -23,6 +23,8 @@ Supported terminals
     * Cmder >= 191012
     * ConEmu >= 210206
     * Fluent Terminal >= 0.7.5
+ - Linux:
+    * Windows Terminal >= 1.6 via WSL
 
 Known issues
 ------------

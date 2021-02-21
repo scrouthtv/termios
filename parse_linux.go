@@ -4,9 +4,11 @@ package termios
 
 import "os"
 import "fmt"
+import "unicode"
+import "unicode/utf8"
 
 // linuxParser is the default parser for linux terminals that should always work.
-// It compares 
+// It compares entered key sequences to a terminfo (either on disk or built-in)
 type linuxParser struct {
 	parent *nixTerm
 	i      *info
@@ -40,6 +42,13 @@ func (p *linuxParser) asKey(in []byte) []Key {
 	var position int = 0
 	var l int
 	var k Key
+	var r rune
+
+	// What already works:
+	//  - a-z, A-Z, 0-9, ext latin
+	//  - symbols
+	//  - C-[a-z], C-[A-Z]
+	//  -
 
 	os.Stdout.WriteString("Have to parse [ ")
 	for _, b := range in {
@@ -48,7 +57,6 @@ func (p *linuxParser) asKey(in []byte) []Key {
 	os.Stdout.WriteString("]\r\n")
 
 	for position < len(in) {
-		os.Stdout.WriteString(fmt.Sprintf("p_l#35: Reading @%d: %x\r\n", position, in[position]))
 		if in[position] >= 0x01 && in[position] <= 0x1a {
 			// C-key
 			var r rune = rune(in[position]-0x01) + 'a'
@@ -58,15 +66,25 @@ func (p *linuxParser) asKey(in []byte) []Key {
 			keys = append(keys, Key{KeySpecial, 0, SpecialBackspace})
 			position++
 		} else if in[position] == 0x1b {
-			// parse escape code:
+
+			// is escape code maybe?
 			k, l = p.i.readSpecialKey(in[position:])
 			os.Stdout.WriteString("It's a special key: ")
 			os.Stdout.WriteString(k.String())
 			os.Stdout.WriteString(fmt.Sprintf("\r\nIt's %d long\r\n", l))
-			keys = append(keys, k)
-			position += l + 1
-		} else {
-			position++
+			if k != InvalidKey {
+				keys = append(keys, k)
+				position += l
+				continue
+			}
+
+			// Else try A-Letter, A-letter, A-symbol
+			// TODO in which terminals does this work and why???
+			keys = append(keys, Key{KeyLetter, ModAlt, rune(in[position+1])})
+			position += 2
+		} else if r, l = utf8.DecodeRune(in[position:]); unicode.IsGraphic(r) {
+			keys = append(keys, Key{KeyLetter, 0, r})
+			position += l
 		}
 	}
 

@@ -14,7 +14,7 @@ func TestBasicOpen(t *testing.T) {
 
 	var buf []Key
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		buf, err = term.Read()
 		if err != nil {
 			t.Error(err)
@@ -23,6 +23,10 @@ func TestBasicOpen(t *testing.T) {
 			_, err = term.Write(k.String() + "\r\n")
 			if err != nil {
 				t.Error(err)
+			}
+			if k.Type == KeyLetter && k.Mod == 0 && k.Value == 'q' {
+				term.Close()
+				t.SkipNow()
 			}
 		}
 	}

@@ -5,12 +5,12 @@ package termios
 import "github.com/xo/terminfo"
 
 type info struct {
-	specialKeys map[int][]byte
+	specialKeys map[Key][]byte
 	actions     map[int][]byte
 }
 
 func newEmptyTerminfo() *info {
-	return &info{make(map[int][]byte), make(map[int][]byte)}
+	return &info{make(map[Key][]byte), make(map[int][]byte)}
 }
 
 func loadTerminfo() (*info, error) {
@@ -26,13 +26,15 @@ func loadTerminfo() (*info, error) {
 		var caps map[string][]byte = ti.StringCapsShort()
 		i = newEmptyTerminfo()
 
-		i.specialKeys[SpecialBackspace] = caps["kbs"]
-		i.specialKeys[SpecialDelete] = caps["kdch1"]
-		i.specialKeys[SpecialEnter] = caps["kent"]
-		i.specialKeys[SpecialArrowLeft] = caps["kcub1"]
-		i.specialKeys[SpecialArrowRight] = caps["kcuf1"]
-		i.specialKeys[SpecialArrowUp] = caps["kcuu1"]
-		i.specialKeys[SpecialArrowDown] = caps["kcud1"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialBackspace}] = caps["kbs"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialDelete}] = caps["kdch1"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialEnter}] = caps["kent"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialArrowLeft}] = caps["kcub1"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialArrowRight}] = caps["kcuf1"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialArrowUp}] = caps["kcuu1"]
+		i.specialKeys[Key{KeySpecial, 0, SpecialArrowDown}] = caps["kcud1"]
+
+		addKeys(&i.specialKeys)
 
 		i.actions[ActionInit] = caps["smkx"]
 		i.actions[ActionExit] = caps["rmkx"]
@@ -52,19 +54,20 @@ func loadTerminfo() (*info, error) {
 }
 
 func (info *info) readSpecialKey(in []byte) (Key, int) {
-	var s, i int
+	var i int
+	var k Key
 	var c []byte
 	var b byte
 
 nextSpecial:
-	for s, c = range info.specialKeys {
+	for k, c = range info.specialKeys {
 		if len(in) >= len(c) {
 			for i, b = range c {
 				if in[i] != b {
 					continue nextSpecial
 				}
 			}
-			return Key{KeySpecial, 0, rune(s)}, len(c)
+			return k, len(c)
 		}
 	}
 	return InvalidKey, 1
