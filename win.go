@@ -26,18 +26,19 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
+	// open I/O:
 	var in, out windows.Handle
 	in, err = windows.Open("CONIN$", windows.O_RDWR, 0)
 	if err != nil {
 		return nil, err
 	}
-
 	out, err = windows.Open("CONOUT$", windows.O_RDWR, 0)
 	if err != nil {
 		windows.Close(in)
 		return nil, err
 	}
 
+	// store the old modes:
 	var inMode, outMode uint32
 	err = windows.GetConsoleMode(in, &inMode)
 	if err != nil {
@@ -53,6 +54,23 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
+	// open as raw:
+	inMode = windows.ENABLE_WINDOW_INPUT
+	outMode = windows.ENABLE_PROCESSED_OUTPUT // parse new line
+	err = windows.SetConsoleMode(in, inMode)
+	if err != nil {
+		windows.Close(in)
+		windows.Close(out)
+		return nil, err
+	}
+	err = windows.SetConsoleMode(t.out, outMode)
+	if err != nil {
+		windows.SetConsoleMode(t.in, t.oldInMode)
+		windows.Close(in)
+		windows.Close(out)
+		return nil, err
+	}
+
 	var t winTerm = winTerm{in, out, true, false, inMode, outMode, p}
 
 	return &t, nil
@@ -60,10 +78,6 @@ func Open() (Terminal, error) {
 
 func (t *winTerm) IsOpen() bool {
 	return t.ready && t.in != windows.InvalidHandle && t.out != windows.InvalidHandle
-}
-
-func (t *winTerm) IsRaw() bool {
-	return t.isRaw
 }
 
 func (t *winTerm) Read() ([]Key, error) {
@@ -110,42 +124,4 @@ func (t *winTerm) Close() {
 
 	t.in = windows.InvalidHandle
 	t.out = windows.InvalidHandle
-}
-
-func (t *winTerm) SetRaw(raw bool) error {
-	var inMode, outMode uint32
-	var err error
-
-	err = windows.GetConsoleMode(t.in, &inMode)
-	if err != nil {
-		return err
-	}
-
-	err = windows.GetConsoleMode(t.out, &outMode)
-	if err != nil {
-		return err
-	}
-
-	// see https://docs.microsoft.com/en-us/windows/console/high-level-console-modes
-
-	if raw {
-		inMode = windows.ENABLE_WINDOW_INPUT
-		outMode = windows.ENABLE_PROCESSED_OUTPUT // this is needed so that new line works??????
-	} else {
-		inMode = t.oldInMode
-		outMode = t.oldOutMode
-	}
-
-	err = windows.SetConsoleMode(t.in, inMode)
-	if err != nil {
-		return err
-	}
-	err = windows.SetConsoleMode(t.out, outMode)
-	if err != nil {
-		windows.SetConsoleMode(t.in, t.oldInMode)
-		return err
-	}
-
-	t.isRaw = raw
-	return nil
 }

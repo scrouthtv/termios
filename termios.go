@@ -1,11 +1,22 @@
 package termios
 
+// Terminal is an abstract terminal where the user can press arbitrary keys
+// and the developer can write arbitrary strings as well as some actions
 type Terminal interface {
-	Read() ([]Key, error)
-	Write(string) (int, error)
-	IsOpen() bool
-	IsRaw() bool
 
+	// Read reads a single keypress
+	// Read returns an array of keys in the order that they were typed
+	// or in case of an error an empty list and the error
+	// The terminal is always openend in what one might consider "raw mode"
+	Read() ([]Key, error)
+
+	// Write writes the specified string at the current position into the terminal
+	// It returns the number of bytes (there may be multiple bytes in a character) written
+	// or an error
+	Write(string) (int, error)
+
+	// IsOpen returns whether the developer can currently read from / write to
+	// this terminal.
+	IsOpen() bool
 	Close()
-	SetRaw(bool) error
 }
