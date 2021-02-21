@@ -27,11 +27,15 @@ func loadTerminfo() (*info, error) {
 		i = newEmptyTerminfo()
 
 		i.specialKeys[SpecialBackspace] = caps["kbs"]
-		i.specialKeys[SpecialDelete] = caps["kclr"]
+		i.specialKeys[SpecialDelete] = caps["kdch1"]
 		i.specialKeys[SpecialEnter] = caps["kent"]
+		i.specialKeys[SpecialArrowLeft] = caps["kcub1"]
+		i.specialKeys[SpecialArrowRight] = caps["kcuf1"]
+		i.specialKeys[SpecialArrowUp] = caps["kcuu1"]
+		i.specialKeys[SpecialArrowDown] = caps["kcud1"]
 
 		i.actions[ActionInit] = caps["smkx"]
-		i.actions[ActionClose] = caps["rmkx"]
+		i.actions[ActionExit] = caps["rmkx"]
 
 		return i, nil
 	} else {
@@ -45,4 +49,23 @@ func loadTerminfo() (*info, error) {
 			return nil, err
 		}
 	}
+}
+
+func (info *info) readSpecialKey(in []byte) (Key, int) {
+	var s, i int
+	var c []byte
+	var b byte
+
+nextSpecial:
+	for s, c = range info.specialKeys {
+		if len(in) >= len(c) {
+			for i, b = range c {
+				if in[i] != b {
+					continue nextSpecial
+				}
+			}
+			return Key{KeySpecial, 0, rune(s)}, len(c)
+		}
+	}
+	return InvalidKey, 1
 }

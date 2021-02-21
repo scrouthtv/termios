@@ -38,6 +38,11 @@ var keyNames []string = []string{"letter", "special", "invalid"}
 var modNames []string = []string{"ctrl", "alt", "shift"}
 
 func (k *Key) String() string {
+
+	if *k == InvalidKey {
+		return "Invalid Key"
+	}
+
 	var s string = keyNames[k.Type] + ":"
 
 	for mod, i := range []byte{ModCtrl, ModAlt, ModShift} {

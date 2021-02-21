@@ -26,9 +26,11 @@ func TestBasicOpen(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		_, err = term.Write(buf[0].String() + "\r\n")
-		if err != nil {
-			t.Error(err)
+		for _, k := range buf {
+			_, err = term.Write(k.String() + "\r\n")
+			if err != nil {
+				t.Error(err)
+			}
 		}
 	}
 	err = term.SetRaw(false)

@@ -57,11 +57,12 @@ func Open() (Terminal, error) {
 
 func (t *nixTerm) Read() ([]Key, error) {
 	var err error
-	_, err = unix.Read(t.in, t.inBuf)
+	var n int
+	n, err = unix.Read(t.in, t.inBuf)
 	if err != nil {
 		return nil, err
 	} else {
-		return t.p.asKey(t.inBuf), nil
+		return t.p.asKey(t.inBuf[:n]), nil
 	}
 }
 
@@ -79,6 +80,8 @@ func (t *nixTerm) IsRaw() bool {
 
 func (t *nixTerm) Close() {
 	t.ready = false
+
+	unix.Write(t.out, t.p.formatSimpleAction(ActionExit))
 
 	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)
 	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode)
@@ -119,6 +122,12 @@ func (t *nixTerm) SetRaw(raw bool) error {
 	if err != nil {
 		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
 		return err
+	}
+
+	if raw {
+		unix.Write(t.out, t.p.formatSimpleAction(ActionInit))
+	} else {
+		unix.Write(t.out, t.p.formatSimpleAction(ActionExit))
 	}
 
 	t.isRaw = raw

@@ -10,6 +10,10 @@ var screenInfo info = *newEmptyTerminfo()
 var xtermInfo info = *newEmptyTerminfo()
 var urxvtInfo info = *newEmptyTerminfo()
 
+func init() {
+
+}
+
 func loadBuiltinTerminfo() *info {
 	var term string
 	term = os.Getenv("TERM")
