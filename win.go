@@ -16,6 +16,7 @@ type winTerm struct {
 	p          *winParser
 }
 
+// Open opens a new terminal for raw i/o
 func Open() (Terminal, error) {
 	var err error
 

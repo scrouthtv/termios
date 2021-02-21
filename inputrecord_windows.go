@@ -4,7 +4,7 @@ package termios
 
 type InputRecord struct {
 	Type uint16
-	Data [10]uint16
+	Data [8]uint16
 }
 
 /*type KeyEventRecord struct {
