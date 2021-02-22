@@ -11,6 +11,13 @@ Tag `v3.0` showcases this libraries' functionality and already provides basic fu
  - Linux: xterm parser
  - Linux: parser#open() should return an error
 
+Tag `v3.1` adds the `GetSize()` functionality. It's return value is implementation- and terminal-dependant. The line width should always be reported correctly, however
+ - The old Windows Terminal reports the height of the underlying buffer (lines that aren't visible)
+ - The new Windows Terminal reports the visible height
+ - The Linux implementation is fairly consistent in that it always returns the visible size.
+
+Internally, it works like this: whenever a window size event is caught (`SIGWINCH` on unix, InputRecord with type `0x4` on Windows), the new size is read using platform-specific code in the `readSize()` method. This method is also called on first start to initially set the size.
+
 I originally adopted this library from *creack* on GitHub. The original project had these functions: setting / reading terminal size and (un-) setting raw mode.
 
 The key parsing API supports these keys on all supported terminals:

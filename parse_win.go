@@ -10,10 +10,12 @@ import (
 	"unicode"
 )
 
-type winParser struct{}
+type winParser struct {
+	term *winTerm
+}
 
-func newParser() (*winParser, error) {
-	return &winParser{}, nil
+func newParser(term *winTerm) (*winParser, error) {
+	return &winParser{term}, nil
 }
 
 var vkCodes map[uint16]byte = make(map[uint16]byte)
@@ -57,6 +59,11 @@ func init() {
 func (p *winParser) asKey(i InputRecord) *Key {
 	if i.Type != 0x1 {
 		// ignore everything but keys
+		// I tested using the WindowBufferSizeChange event, however it gets not sent
+		// until the user resizes the window at least once. That's why I'm using
+		// GetConsoleScreenBufferInfo instead.
+		// TODO: maybe it'd be better to read the first size with GetConsoleScreenBufferInfo
+		// store that value and change it whenever we receive 0x4
 		return nil
 	}
 	if i.Data[1] != 0x1 {

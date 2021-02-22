@@ -27,4 +27,13 @@ type Terminal interface {
 	// this terminal.
 	IsOpen() bool
 	Close()
+
+	// GetSize returns the terminal's current size.
+	GetSize() TermSize
+}
+
+// TermSize groups the width and height of a terminal in characters.
+type TermSize struct {
+	Width  uint16
+	Height uint16
 }

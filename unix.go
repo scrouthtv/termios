@@ -5,6 +5,9 @@ package termios
 // unix.go implements the Terminal interface on Unix-like platforms.
 
 import (
+	"os"
+	"os/signal"
+
 	"golang.org/x/sys/unix"
 )
 
@@ -23,6 +26,9 @@ type nixTerm struct {
 	oldMode unix.Termios
 	p       unixParser
 	inBuf   []byte
+	size    TermSize
+	sCh     chan os.Signal
+	closer  chan bool // send true through closer to indicate that this terminal is going down
 }
 
 // Open opens a new terminal for raw i/o
@@ -78,7 +84,14 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
-	var t nixTerm = nixTerm{in, out, true, oldMode, nil, make([]byte, ioBufSize)}
+	var sCh chan os.Signal = make(chan os.Signal, 1)
+
+	signal.Notify(sCh, unix.SIGWINCH)
+
+	var closer chan bool = make(chan bool, 1)
+
+	var t nixTerm = nixTerm{in, out, true, oldMode, nil, make([]byte, ioBufSize),
+		TermSize{0, 0}, sCh, closer}
 
 	var p unixParser
 	p, err = newParser(&t)
@@ -89,7 +102,40 @@ func Open() (Terminal, error) {
 
 	p.open()
 
+	t.readSize()
+
 	return &t, nil
+}
+
+func (t *nixTerm) sizeReadLoop() {
+	var signal os.Signal
+	var doClose bool
+
+	for {
+		select {
+		case signal = <-t.sCh:
+			switch signal {
+			case unix.SIGWINCH:
+				t.readSize()
+			case unix.SIGTSTP:
+				t.Close()
+			}
+		case doClose = <-t.closer:
+			return
+		}
+	}
+}
+
+func (t *nixTerm) readSize() {
+	size, err := unix.IoctlGetWinsize(t.in, unix.TIOCGWINSZ)
+	if err == nil {
+		t.size.Width = size.Cols
+		t.size.Height = size.Rows
+	}
+}
+
+func (t *nixTerm) GetSize() TermSize {
+	return t.size
 }
 
 func (t *nixTerm) Read() ([]Key, error) {
@@ -116,6 +162,10 @@ func (t *nixTerm) IsOpen() bool {
 }
 
 func (t *nixTerm) Close() {
+	t.closer <- true
+	close(t.sCh)
+	close(t.closer)
+
 	t.ready = false
 
 	t.p.close()

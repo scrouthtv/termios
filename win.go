@@ -20,12 +20,6 @@ type winTerm struct {
 func Open() (Terminal, error) {
 	var err error
 
-	var p *winParser
-	p, err = newParser()
-	if err != nil {
-		return nil, err
-	}
-
 	// open I/O:
 	var in, out windows.Handle
 	in, err = windows.Open("CONIN$", windows.O_RDWR, 0)
@@ -57,7 +51,7 @@ func Open() (Terminal, error) {
 	var oldInMode, oldOutMode uint32 = inMode, outMode
 
 	// open as raw:
-	inMode = windows.ENABLE_WINDOW_INPUT
+	inMode = windows.ENABLE_WINDOW_INPUT      // enable input
 	outMode = windows.ENABLE_PROCESSED_OUTPUT // parse new line
 	err = windows.SetConsoleMode(in, inMode)
 	if err != nil {
@@ -73,7 +67,14 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
-	var t winTerm = winTerm{in, out, true, false, oldInMode, oldOutMode, p}
+	var t winTerm = winTerm{in, out, true, false, oldInMode, oldOutMode, nil}
+
+	var p *winParser
+	p, err = newParser(&t)
+	if err != nil {
+		return nil, err
+	}
+	t.p = p
 
 	return &t, nil
 }
@@ -134,4 +135,10 @@ func (t *winTerm) Close() {
 
 	t.in = windows.InvalidHandle
 	t.out = windows.InvalidHandle
+}
+
+func (t *winTerm) GetSize() TermSize {
+	var info windows.ConsoleScreenBufferInfo
+	windows.GetConsoleScreenBufferInfo(t.out, &info)
+	return TermSize{Width: uint16(info.Size.X), Height: uint16(info.Size.Y)}
 }
