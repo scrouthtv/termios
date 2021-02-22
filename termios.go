@@ -10,10 +10,14 @@ type Terminal interface {
 	// The terminal is always openend in what one might consider "raw mode"
 	Read() ([]Key, error)
 
-	// Write writes the specified string at the current position into the terminal
+	// WriteString writes the specified string at the current position into the terminal
 	// It returns the number of bytes (there may be multiple bytes in a character) written
 	// or an error
-	Write(string) (int, error)
+	WriteString(string) (int, error)
+
+	// Write writes the specified data at the current position into the terminal.
+	// It returns the number of bytes written or an error.
+	Write([]byte) (int, error)
 
 	// IsOpen returns whether the developer can currently read from / write to
 	// this terminal.

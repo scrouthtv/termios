@@ -54,6 +54,8 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
+	var oldInMode, oldOutMode uint32 = inMode, outMode
+
 	// open as raw:
 	inMode = windows.ENABLE_WINDOW_INPUT
 	outMode = windows.ENABLE_PROCESSED_OUTPUT // parse new line
@@ -63,15 +65,15 @@ func Open() (Terminal, error) {
 		windows.Close(out)
 		return nil, err
 	}
-	err = windows.SetConsoleMode(t.out, outMode)
+	err = windows.SetConsoleMode(out, outMode)
 	if err != nil {
-		windows.SetConsoleMode(t.in, t.oldInMode)
+		windows.SetConsoleMode(in, oldInMode)
 		windows.Close(in)
 		windows.Close(out)
 		return nil, err
 	}
 
-	var t winTerm = winTerm{in, out, true, false, inMode, outMode, p}
+	var t winTerm = winTerm{in, out, true, false, oldInMode, oldOutMode, p}
 
 	return &t, nil
 }
@@ -99,7 +101,13 @@ func (t *winTerm) Read() ([]Key, error) {
 	return []Key{*t.p.asKey(iR)}, nil
 }
 
-func (t *winTerm) Write(p string) (int, error) {
+// The Write method on Windows does not work well with extended latin characters.
+// Use with caution.
+func (t *winTerm) Write(p []byte) (int, error) {
+	return windows.Write(t.out, p)
+}
+
+func (t *winTerm) WriteString(p string) (int, error) {
 	var written uint32 = 0
 	var err error
 	var rs []rune = []rune(p)

@@ -101,7 +101,11 @@ func (t *nixTerm) Read() ([]Key, error) {
 	}
 }
 
-func (t *nixTerm) Write(s string) (int, error) {
+func (t *nixTerm) Write(p []byte) (int, error) {
+	return unix.Write(t.out, p)
+}
+
+func (t *nixTerm) WriteString(s string) (int, error) {
 	return unix.Write(t.out, []byte(s))
 }
 

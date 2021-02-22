@@ -20,7 +20,7 @@ func TestBasicOpen(t *testing.T) {
 			t.Error(err)
 		}
 		for _, k := range buf {
-			_, err = term.Write(k.String() + "\r\n")
+			_, err = term.WriteString(k.String() + "\r\n")
 			if err != nil {
 				t.Error(err)
 			}

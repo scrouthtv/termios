@@ -27,12 +27,12 @@ func newParser(parent *nixTerm) (unixParser, error) {
 }
 
 func (p *linuxParser) open() {
-	p.parent.Write(string(p.formatSimpleAction(ActionInit)))
+	p.parent.Write(p.formatSimpleAction(ActionInit))
 }
 
 func (p *linuxParser) close() {
 	// FIXME: reset to the mode we were in when we first started
-	p.parent.Write(string(p.formatSimpleAction(ActionExit)))
+	p.parent.Write(p.formatSimpleAction(ActionExit))
 }
 
 // ParseUTF8 splits the inputted bytes into logical keypresses

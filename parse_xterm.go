@@ -1,3 +1,5 @@
+// +build linux freebsd openbsd netbsd dragonfly darwin
+
 package termios
 
 import (
@@ -34,7 +36,7 @@ func (p *xtermParser) open() {
 	}
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'h'})
 
-	p.parent.Write(s.String())
+	p.parent.WriteString(s.String())
 }
 
 func (p *xtermParser) close() {
@@ -45,7 +47,7 @@ func (p *xtermParser) close() {
 	}
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'l'})
 
-	p.parent.Write(s.String())
+	p.parent.WriteString(s.String())
 }
 
 func (p *xtermParser) asKey(in []byte) []Key {

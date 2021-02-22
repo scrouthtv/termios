@@ -1,6 +1,16 @@
 goterm
 ======
 
+Under construction
+------------------
+
+Tag `v3.0` showcases this libraries' functionality and already provides basic functionality for all major platforms. Still to be done:
+ - Testing (different Linux terminals, bsd, darwin)
+ - Linux: C-Special, A-Special, S-Special -- they neither have terminfo entries nor are identical for all terminals
+ - Linux: the builtin terminfo is currently empty
+ - Linux: xterm parser
+ - Linux: parser#open() should return an error
+
 I originally adopted this library from *creack* on GitHub. The original project had these functions: setting / reading terminal size and (un-) setting raw mode.
 
 The key parsing API supports these keys on all supported terminals:
@@ -32,6 +42,7 @@ Known issues
 ------------
 
  - Windows A-arrow, A-enter, A-escape, A-tab, C-A-Entf are not send
+ - The `Write([]byte)` method does not work well with extended latin characters. Test before usage.
  - Windows/Terminal does not send many keys becauseof default keybindings: A-Enter, F11, C-Tab, C-S-Tab, S-Ins
  - Windows/Cmder does not send C-ArrowUp, C-ArrowDown
  - Windows/ConEmu does not send C-PgUp, C-PgDown by default (bound to scroll up / down)
