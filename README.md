@@ -11,7 +11,7 @@ Tag `v3.0` showcases this libraries' functionality and already provides basic fu
  - Linux: xterm parser
  - Linux: parser#open() should return an error
 
-Tag `v3.1` adds the `GetSize()` functionality. It's return value is implementation- and terminal-dependant. The line width should always be reported correctly, however
+Tag `v3.2` adds the `GetSize()` functionality. It's return value is implementation- and terminal-dependant. The line width should always be reported correctly, however
  - The old Windows Terminal reports the height of the underlying buffer (lines that aren't visible)
  - The new Windows Terminal reports the visible height
  - The Linux implementation is fairly consistent in that it always returns the visible size.
