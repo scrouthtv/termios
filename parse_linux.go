@@ -58,26 +58,29 @@ func (p *linuxParser) asKey(in []byte) []Key {
 	os.Stdout.WriteString("]\r\n")
 
 	for position < len(in) {
-		if in[position] >= 0x01 && in[position] <= 0x1a {
+		// is escape code maybe?
+		k, l = p.i.readSpecialKey(in[position:])
+		os.Stdout.WriteString("It's a special key: ")
+		os.Stdout.WriteString(k.String())
+		os.Stdout.WriteString(fmt.Sprintf("\r\nIt's %d long\r\n", l))
+		if k != InvalidKey {
+			keys = append(keys, k)
+			position += l
+			continue
+		}
+
+		if in[position] == 0x7f { // somehow, they always get this wrong
+			keys = append(keys, Key{KeySpecial, 0, SpecialBackspace})
+			position++
+		} else if in[position] == 0xd { // this one as well
+			keys = append(keys, Key{KeySpecial, 0, SpecialEnter})
+			position++
+		} else if in[position] >= 0x01 && in[position] <= 0x1a {
 			// C-key
 			var r rune = rune(in[position]-0x01) + 'a'
 			keys = append(keys, Key{KeyLetter, ModCtrl, r})
 			position++
-		} else if in[position] == 0x7f {
-			keys = append(keys, Key{KeySpecial, 0, SpecialBackspace})
-			position++
 		} else if in[position] == 0x1b {
-
-			// is escape code maybe?
-			k, l = p.i.readSpecialKey(in[position:])
-			os.Stdout.WriteString("It's a special key: ")
-			os.Stdout.WriteString(k.String())
-			os.Stdout.WriteString(fmt.Sprintf("\r\nIt's %d long\r\n", l))
-			if k != InvalidKey {
-				keys = append(keys, k)
-				position += l
-				continue
-			}
 
 			// Else try A-Letter, A-letter, A-symbol
 			// TODO in which terminals does this work and why???

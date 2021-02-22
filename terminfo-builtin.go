@@ -17,6 +17,7 @@ func init() {
 var extraKeys map[Key][]byte = make(map[Key][]byte)
 
 func init() {
+	// lets get some keeeys
 	extraKeys[Key{KeySpecial, ModCtrl, SpecialArrowUp}] = []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x41}
 	extraKeys[Key{KeySpecial, ModCtrl, SpecialArrowDown}] = []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x42}
 	extraKeys[Key{KeySpecial, ModCtrl, SpecialArrowRight}] = []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x43}

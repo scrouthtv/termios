@@ -8,9 +8,11 @@ The key parsing API supports these keys on all supported terminals:
  - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ ` ´
  - C-[a-z], for C-[A-Z] the lower case variant C-[a-z] should be returned
  - A-letter, A-Letter, A-symbol
- - F1 through F12, C-Fx, A-Fx
+ - F1 through F12, C-Fx, S-Fx, C-S-Fx
  - Special keys: Delete, Backspace, Enter, Insert, Home, End, PgUp, PgDown, Arrow Keys
- - C-Special, A-Special, S-Special, all combinations of these
+ - C-Special, A-Special, S-Special
+
+Combinations of different modifiers are only partly supported. 
 
 For non-special keys, C-A-key is *explicitely* not supported and will always be replaced by key.
 
@@ -29,11 +31,12 @@ Supported terminals
 Known issues
 ------------
 
- - Windows: A-F1 through A-F12, A-arrow, A-enter, A-escape, A-tab, C-A-Entf are not send
+ - Windows A-arrow, A-enter, A-escape, A-tab, C-A-Entf are not send
  - Windows/Terminal does not send many keys becauseof default keybindings: A-Enter, F11, C-Tab, C-S-Tab, S-Ins
  - Windows/Cmder does not send C-ArrowUp, C-ArrowDown
  - Windows/ConEmu does not send C-PgUp, C-PgDown by default (bound to scroll up / down)
  - Windows/Fluent Terminal hides a lot of keys: https://github.com/felixse/FluentTerminal/issues/885
+ - Linux sends C-m instead of enter, C-j instead of C-enter, ...
 
 termios
 -------
