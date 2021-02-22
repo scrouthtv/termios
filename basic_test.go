@@ -3,7 +3,9 @@ package termios
 // basic_test.go contains a test function that can be used to debug key sequences.
 
 import (
+	"fmt"
 	"testing"
+	"time"
 )
 
 func TestBasicOpen(t *testing.T) {
@@ -34,6 +36,19 @@ func TestBasicOpen(t *testing.T) {
 	}
 
 	term.Close()
+}
+
+func TestSizeReading(t *testing.T) {
+	term, err := Open()
+	if err != nil {
+		t.Error(err)
+	}
+
+	for i := 0; i < 20; i++ {
+		term.WriteString(fmt.Sprintf("Current size: width %d, height %d\r\n",
+			term.GetSize().Width, term.GetSize().Height))
+		time.Sleep(1 * time.Second)
+	}
 }
 
 // FIXED in a3abd28, partly reintroduced in e62fe12:

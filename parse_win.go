@@ -59,11 +59,6 @@ func init() {
 func (p *winParser) asKey(i InputRecord) *Key {
 	if i.Type != 0x1 {
 		// ignore everything but keys
-		// I tested using the WindowBufferSizeChange event, however it gets not sent
-		// until the user resizes the window at least once. That's why I'm using
-		// GetConsoleScreenBufferInfo instead.
-		// TODO: maybe it'd be better to read the first size with GetConsoleScreenBufferInfo
-		// store that value and change it whenever we receive 0x4
 		return nil
 	}
 	if i.Data[1] != 0x1 {

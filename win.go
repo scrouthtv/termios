@@ -79,6 +79,12 @@ func Open() (Terminal, error) {
 	return &t, nil
 }
 
+func (t *winTerm) GetSize() TermSize {
+	var info windows.ConsoleScreenBufferInfo
+	windows.GetConsoleScreenBufferInfo(t.out, &info)
+	return TermSize{Width: uint16(info.Size.X), Height: uint16(info.Size.Y)}
+}
+
 func (t *winTerm) IsOpen() bool {
 	return t.ready && t.in != windows.InvalidHandle && t.out != windows.InvalidHandle
 }
@@ -135,10 +141,4 @@ func (t *winTerm) Close() {
 
 	t.in = windows.InvalidHandle
 	t.out = windows.InvalidHandle
-}
-
-func (t *winTerm) GetSize() TermSize {
-	var info windows.ConsoleScreenBufferInfo
-	windows.GetConsoleScreenBufferInfo(t.out, &info)
-	return TermSize{Width: uint16(info.Size.X), Height: uint16(info.Size.Y)}
 }

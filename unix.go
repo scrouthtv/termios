@@ -85,10 +85,9 @@ func Open() (Terminal, error) {
 	}
 
 	var sCh chan os.Signal = make(chan os.Signal, 1)
+	var closer chan bool = make(chan bool, 1)
 
 	signal.Notify(sCh, unix.SIGWINCH)
-
-	var closer chan bool = make(chan bool, 1)
 
 	var t nixTerm = nixTerm{in, out, true, oldMode, nil, make([]byte, ioBufSize),
 		TermSize{0, 0}, sCh, closer}
@@ -103,11 +102,12 @@ func Open() (Terminal, error) {
 	p.open()
 
 	t.readSize()
+	go t.signalHandler()
 
 	return &t, nil
 }
 
-func (t *nixTerm) sizeReadLoop() {
+func (t *nixTerm) signalHandler() {
 	var signal os.Signal
 	var doClose bool
 
@@ -121,7 +121,9 @@ func (t *nixTerm) sizeReadLoop() {
 				t.Close()
 			}
 		case doClose = <-t.closer:
-			return
+			if doClose {
+				return
+			}
 		}
 	}
 }
@@ -129,8 +131,8 @@ func (t *nixTerm) sizeReadLoop() {
 func (t *nixTerm) readSize() {
 	size, err := unix.IoctlGetWinsize(t.in, unix.TIOCGWINSZ)
 	if err == nil {
-		t.size.Width = size.Cols
-		t.size.Height = size.Rows
+		t.size.Width = size.Col
+		t.size.Height = size.Row
 	}
 }
 

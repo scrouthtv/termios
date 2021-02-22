@@ -16,7 +16,11 @@ Tag `v3.1` adds the `GetSize()` functionality. It's return value is implementati
  - The new Windows Terminal reports the visible height
  - The Linux implementation is fairly consistent in that it always returns the visible size.
 
-Internally, it works like this: whenever a window size event is caught (`SIGWINCH` on unix, InputRecord with type `0x4` on Windows), the new size is read using platform-specific code in the `readSize()` method. This method is also called on first start to initially set the size.
+The unix implementation waits for the signal SIGWINCH and reads the new window size using ioctl.
+
+The windows implementation directly reads the current window size from the console info.
+Waiting for a WINDOW_SIZE_CHANGE event isn't applicable as this would require the developer
+reading user input every time just before the window size is required or else it'd get desynced.
 
 I originally adopted this library from *creack* on GitHub. The original project had these functions: setting / reading terminal size and (un-) setting raw mode.
 
