@@ -59,3 +59,10 @@ func (k *Key) String() string {
 
 	return s
 }
+
+// Equal compares this key with another one and returns
+// wether they correspond to the same combination of keys.
+// Keep in mind that a key might not always have all modifiers set.
+func (k *Key) Equal(other *Key) bool {
+	return k.Type == other.Type && k.Mod == other.Mod && k.Value == other.Value
+}
