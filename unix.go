@@ -58,38 +58,13 @@ func Open() (Terminal, error) {
 		unix.Close(out)
 		return nil, err
 	}
-	var oldMode unix.Termios = *mode
-
-	// apply raw mode flags:
-	mode.Iflag &^= unix.BRKINT | unix.ICRNL | unix.INPCK | unix.ISTRIP | unix.IXON
-	mode.Oflag &^= unix.OPOST
-	mode.Lflag &^= unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN
-	mode.Cflag &^= unix.CSIZE | unix.PARENB
-	mode.Cflag |= unix.CS8
-	mode.Cc[unix.VMIN] = 1
-	mode.Cc[unix.VTIME] = 0
-
-	// set raw termios:
-	err = unix.IoctlSetTermios(in, reqSetTermios, mode)
-	if err != nil {
-		unix.Close(in)
-		unix.Close(out)
-		return nil, err
-	}
-	err = unix.IoctlSetTermios(out, reqSetTermios, mode)
-	if err != nil {
-		unix.IoctlSetTermios(in, reqSetTermios, mode)
-		unix.Close(in)
-		unix.Close(out)
-		return nil, err
-	}
 
 	var sCh chan os.Signal = make(chan os.Signal, 1)
 	var closer chan bool = make(chan bool, 1)
 
 	signal.Notify(sCh, unix.SIGWINCH)
 
-	var t nixTerm = nixTerm{in, out, true, oldMode, nil, make([]byte, ioBufSize),
+	var t nixTerm = nixTerm{in, out, true, *mode, nil, make([]byte, ioBufSize),
 		TermSize{0, 0}, sCh, closer}
 
 	var p unixParser
@@ -105,6 +80,46 @@ func Open() (Terminal, error) {
 	go t.signalHandler()
 
 	return &t, nil
+}
+
+func (t *nixTerm) SetRaw(raw bool) error {
+	var mode *unix.Termios
+	var err error
+
+	mode, err = unix.IoctlGetTermios(t.in, reqGetTermios)
+	if err != nil {
+		return err
+	}
+
+	if raw {
+		// apply raw mode flags:
+		mode.Iflag &^= unix.BRKINT | unix.ICRNL | unix.INPCK | unix.ISTRIP | unix.IXON
+		mode.Oflag &^= unix.OPOST
+		mode.Lflag &^= unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN
+		mode.Cflag &^= unix.CSIZE | unix.PARENB
+		mode.Cflag |= unix.CS8
+		mode.Cc[unix.VMIN] = 1
+		mode.Cc[unix.VTIME] = 0
+	} else {
+		mode = &t.oldMode
+	}
+
+	// set termios:
+	err = unix.IoctlSetTermios(t.in, reqSetTermios, mode)
+	if err != nil {
+		unix.Close(t.in)
+		unix.Close(t.out)
+		return err
+	}
+	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
+	if err != nil {
+		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
+		unix.Close(t.in)
+		unix.Close(t.out)
+		return err
+	}
+
+	return nil
 }
 
 func (t *nixTerm) signalHandler() {

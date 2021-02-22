@@ -48,26 +48,7 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
-	var oldInMode, oldOutMode uint32 = inMode, outMode
-
-	// open as raw:
-	inMode = windows.ENABLE_WINDOW_INPUT      // enable input
-	outMode = windows.ENABLE_PROCESSED_OUTPUT // parse new line
-	err = windows.SetConsoleMode(in, inMode)
-	if err != nil {
-		windows.Close(in)
-		windows.Close(out)
-		return nil, err
-	}
-	err = windows.SetConsoleMode(out, outMode)
-	if err != nil {
-		windows.SetConsoleMode(in, oldInMode)
-		windows.Close(in)
-		windows.Close(out)
-		return nil, err
-	}
-
-	var t winTerm = winTerm{in, out, true, false, oldInMode, oldOutMode, nil}
+	var t winTerm = winTerm{in, out, true, false, inMode, outMode, nil}
 
 	var p *winParser
 	p, err = newParser(&t)
@@ -77,6 +58,30 @@ func Open() (Terminal, error) {
 	t.p = p
 
 	return &t, nil
+}
+
+// SetRaw (un-) sets the terminal's stdin & stdout to raw mode.
+// Keep in mind that the winTerm.Read() functionality reads single characters
+// in both modes.
+func (t *winTerm) SetRaw(raw bool) error {
+	var inMode, outMode, oldInMode uint32
+	var err error
+
+	windows.GetConsoleMode(t.in, &oldInMode)
+
+	inMode = windows.ENABLE_WINDOW_INPUT      // enable input
+	outMode = windows.ENABLE_PROCESSED_OUTPUT // parse new line
+	err = windows.SetConsoleMode(t.in, inMode)
+	if err != nil {
+		return err
+	}
+	err = windows.SetConsoleMode(t.out, outMode)
+	if err != nil {
+		windows.SetConsoleMode(t.in, oldInMode)
+		return err
+	}
+
+	return nil
 }
 
 func (t *winTerm) GetSize() TermSize {

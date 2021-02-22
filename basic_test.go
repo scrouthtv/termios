@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+func TestRawCooked(t *testing.T) {
+	term, _ := Open()
+
+	for i := 0; i < 3; i++ {
+		term.SetRaw(false)
+		term.WriteString("Now it should be cooked")
+		term.Read()
+		term.SetRaw(true)
+		term.WriteString("Now it should be raw")
+		term.Read()
+	}
+}
+
 func TestBasicOpen(t *testing.T) {
 	var term Terminal
 	var err error

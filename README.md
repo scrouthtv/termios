@@ -16,6 +16,8 @@ Tag `v3.2` adds the `GetSize()` functionality. It's return value is implementati
  - The new Windows Terminal reports the visible height
  - The Linux implementation is fairly consistent in that it always returns the visible size.
 
+In `v3.3`, the `SetRaw()` functionality was reintroduced. 
+
 The unix implementation waits for the signal SIGWINCH and reads the new window size using ioctl.
 
 The windows implementation directly reads the current window size from the console info.

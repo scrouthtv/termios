@@ -23,6 +23,9 @@ type Terminal interface {
 	// It returns the number of bytes written or an error.
 	Write([]byte) (int, error)
 
+	// SetRaw enables or disables raw mode for this terminal.
+	SetRaw(bool) error
+
 	// IsOpen returns whether the developer can currently read from / write to
 	// this terminal.
 	IsOpen() bool
