@@ -166,7 +166,6 @@ func (t *nixTerm) IsOpen() bool {
 func (t *nixTerm) Close() {
 	t.closer <- true
 	close(t.sCh)
-	close(t.closer)
 
 	t.ready = false
 
