@@ -53,11 +53,13 @@ func (p *xtermParser) close() {
 func (p *xtermParser) asKey(in []byte) []Key {
 	var keys []Key
 
-	os.Stdout.WriteString("Have to parse [ ")
-	for _, b := range in {
-		os.Stdout.WriteString(fmt.Sprintf("0x%x ", b))
+	if doDebug {
+		os.Stdout.WriteString("Have to parse [ ")
+		for _, b := range in {
+			os.Stdout.WriteString(fmt.Sprintf("0x%x ", b))
+		}
+		os.Stdout.WriteString("]\r\n")
 	}
-	os.Stdout.WriteString("]\r\n")
 
 	panic("xterm parser not yet implemented")
 

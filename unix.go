@@ -2,6 +2,8 @@
 
 package termios
 
+// unix.go implements the Terminal interface on Unix-like platforms.
+
 import (
 	"golang.org/x/sys/unix"
 )

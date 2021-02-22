@@ -2,6 +2,8 @@
 
 package termios
 
+// parse_linux.go contains functionality for reading a Key from a []byte input on Unix.
+
 import "os"
 import "fmt"
 import "unicode"
@@ -51,18 +53,22 @@ func (p *linuxParser) asKey(in []byte) []Key {
 	//  - A-letter, A-Letter, A-symbol
 	// Special keys starting with x1b are delegated to the info implementation
 
-	os.Stdout.WriteString("Have to parse [ ")
-	for _, b := range in {
-		os.Stdout.WriteString(fmt.Sprintf("0x%x ", b))
+	if doDebug {
+		os.Stdout.WriteString("Have to parse [ ")
+		for _, b := range in {
+			os.Stdout.WriteString(fmt.Sprintf("0x%x ", b))
+		}
+		os.Stdout.WriteString("]\r\n")
 	}
-	os.Stdout.WriteString("]\r\n")
 
 	for position < len(in) {
 		// is escape code maybe?
 		k, l = p.i.readSpecialKey(in[position:])
-		os.Stdout.WriteString("It's a special key: ")
-		os.Stdout.WriteString(k.String())
-		os.Stdout.WriteString(fmt.Sprintf("\r\nIt's %d long\r\n", l))
+		if doDebug {
+			os.Stdout.WriteString("It's a special key: ")
+			os.Stdout.WriteString(k.String())
+			os.Stdout.WriteString(fmt.Sprintf("\r\nIt's %d long\r\n", l))
+		}
 		if k != InvalidKey {
 			keys = append(keys, k)
 			position += l

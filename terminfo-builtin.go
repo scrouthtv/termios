@@ -2,6 +2,9 @@
 
 package termios
 
+// terminfo-builtin.go stores builtin terminfo tables.
+// Currently, terminfo tables for linux, screen, xterm and urxvt are builtin.
+
 import "os"
 import "strings"
 

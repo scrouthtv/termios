@@ -1,5 +1,7 @@
 package termios
 
+// special.go defines our own constants for special keys.
+
 const (
 	// SpecialBackspace is the key that deletes the character to the left of the cursor
 	SpecialBackspace = iota

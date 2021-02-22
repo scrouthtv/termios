@@ -94,7 +94,9 @@ func (t *winTerm) Read() ([]Key, error) {
 		if err != nil {
 			return nil, err
 		}
-		windows.Write(t.out, []byte(iR.String()))
+		if doDebug {
+			t.WriteString(iR.String())
+		}
 		k = t.p.asKey(iR)
 	}
 

@@ -1,5 +1,9 @@
 package termios
 
+// termios.go defines the Terminal interface and some global constants.
+
+const doDebug = false
+
 // Terminal is an abstract terminal where the user can press arbitrary keys
 // and the developer can write arbitrary strings as well as some actions
 type Terminal interface {

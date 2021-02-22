@@ -2,6 +2,8 @@
 
 package termios
 
+// terminfo.go loads all required information from a terminfo file on the drive.
+
 import "github.com/xo/terminfo"
 
 type info struct {

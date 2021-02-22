@@ -1,5 +1,7 @@
 package termios
 
+// basic_test.go contains a test function that can be used to debug key sequences.
+
 import (
 	"testing"
 )
@@ -34,7 +36,7 @@ func TestBasicOpen(t *testing.T) {
 	term.Close()
 }
 
-// FIXED in a3abd28:
+// FIXED in a3abd28, partly reintroduced in e62fe12:
 /*func TestUmls(t *testing.T) {
 	term, err := Open()
 	if err != nil {

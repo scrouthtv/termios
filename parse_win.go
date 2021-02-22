@@ -2,6 +2,8 @@
 
 package termios
 
+// parse_win.go contains functionality for reading a Key from an InputRecord on Windows.
+
 import (
 	"fmt"
 	"strings"
