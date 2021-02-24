@@ -11,7 +11,7 @@ import (
 
 var _ unsafe.Pointer
 
-var procReadConsoleInputW = modkernel32.NewProc("ReadConsoleInputW")
+var procReadConsoleInputW = modkernel32.NewProc("ReadConsoleInputW") // W indicates wide mode
 
 func ReadConsoleInput(console windows.Handle, rec *InputRecord, toread uint32, read *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procReadConsoleInputW.Addr(), 4,
