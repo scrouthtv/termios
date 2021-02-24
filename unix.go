@@ -166,6 +166,11 @@ func (t *nixTerm) Read() ([]Key, error) {
 	}
 }
 
+func (t *nixTerm) SetStyle(s Style) {
+	// TODO
+	panic("not impl")
+}
+
 func (t *nixTerm) Write(p []byte) (int, error) {
 	return unix.Write(t.out, p)
 }
