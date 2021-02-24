@@ -1,0 +1,48 @@
+output:
+
+linters-settings:
+  dupl:
+    threshold: 50
+  errcheck:
+    check-type-assertion: true
+    check-blank: true
+  funlen:
+    lines: 100
+    statements: 80
+  gcognit:
+    min-complexity: 15
+  gocyclo:
+    min-complexity: 15
+  cyclop:
+    max-complexity: 15
+    package-average: 0.0
+  nestif:
+    min-complexity: 5
+  goconst:
+    min-len: 0
+    min-occurences: 3
+  gocritic:
+    enabled-checks: badLock,badRegexp,builtinShadowDecl,sloppyReassign,sloppyTypeAssert,truncateCmp,unnecessaryDefer,commentedOutImport,hexLiteral,importShadow,initClause,nestingReduce,whyNoLint,yodaStyleExpr,appendCombine,equalFold,hugeParam,indexAlloc,rangeExprCopy,rangeValCopy
+  godot:
+    comments: all
+  gomnd:
+    settings:
+      mnd:
+        checks: argument, case, condition, operation, return, assign
+        ignored-numbers: 0,1,2,10,16,100
+  lll:
+    line-length: 120
+  maligned:
+    suggest-new: true
+  misspell:
+    local: US
+  predeclared:
+    q: true
+  unused:
+    check-exported: false
+  wsl:
+    allow-cuddle-declarations: true
+
+linters:
+  enable-all: true
+  disable: nlreturn,ifshort,nolintlint,tparallel,paralleltest,testpackage,gci,scopelint,gochecknoglobals
