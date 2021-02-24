@@ -20,10 +20,12 @@ Tag `v3.2` adds the `GetSize()` functionality. It's return value is implementati
 
 In `v3.3`, the `SetRaw()` functionality was reintroduced. 
 
+Tag `v4.0` introduced the `Style` and `Color` type. Every terminal is able set its style to one that as closely as possible resembles the specified style (e. g. before Windows 10 there were only 16 colors).
+
 The unix implementation waits for the signal SIGWINCH and reads the new window size using ioctl.
 
 The windows implementation directly reads the current window size from the console info.
-Waiting for a WINDOW_SIZE_CHANGE event isn't applicable as this would require the developer
+Waiting for a `WINDOW_SIZE_CHANGE` event isn't applicable as this would require the developer
 reading user input every time just before the window size is required or else it'd get desynced.
 
 I originally adopted this library from *creack* on GitHub. The original project had these functions: setting / reading terminal size and (un-) setting raw mode.
