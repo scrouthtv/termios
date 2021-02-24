@@ -1,6 +1,6 @@
 // +build windows
 
-package termios
+package bwin
 
 import (
 	"syscall"
