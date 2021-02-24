@@ -1,5 +1,7 @@
-goterm
-======
+termios
+=======
+
+For documentation, see https://pkg.go.dev/github.com/scrouthtv/termios.
 
 Under construction
 ------------------
