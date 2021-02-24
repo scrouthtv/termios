@@ -33,6 +33,9 @@ type Terminal interface {
 
 	// GetSize returns the terminal's current size.
 	GetSize() TermSize
+
+	// SetStyle sets the terminal style. Not all terminals support all styles (e. g. 24bit colors).
+	SetStyle(Style)
 }
 
 // TermSize groups the width and height of a terminal in characters.
