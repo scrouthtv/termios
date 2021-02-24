@@ -4,6 +4,7 @@ package termios
 
 import (
 	"golang.org/x/sys/windows"
+	"github.com/scrouthtv/termios/bwin"
 )
 
 type winTerm struct {
@@ -14,6 +15,11 @@ type winTerm struct {
 	oldInMode  uint32
 	oldOutMode uint32
 	p          *winParser
+	a          actor
+}
+
+type actor interface {
+	setStyle(Style)
 }
 
 // Open opens a new terminal for raw i/o
@@ -48,7 +54,9 @@ func Open() (Terminal, error) {
 		return nil, err
 	}
 
-	var t winTerm = winTerm{in, out, true, false, inMode, outMode, nil}
+	var t winTerm = winTerm{in, out, true, false, inMode, outMode, nil, nil}
+
+	t.a = &oldActor{&t}
 
 	var p *winParser
 	p, err = newParser(&t)
@@ -113,6 +121,10 @@ func (t *winTerm) Read() ([]Key, error) {
 	}
 
 	return []Key{*t.p.asKey(iR)}, nil
+}
+
+func (t *winTerm) SetStyle(s Style) {
+	return t.a.setStyle(s)
 }
 
 // The Write method on Windows does not work well with extended latin characters.
