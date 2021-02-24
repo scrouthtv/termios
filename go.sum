@@ -1,3 +1,5 @@
+github.com/scrouthtv/termios/bwin v0.0.0-20210224081713-577d425e36ac h1:K1RdYdmYeQXzu4HOJq05SKt0HwL/9U+hh5ljMISUYes=
+github.com/scrouthtv/termios/bwin v0.0.0-20210224081713-577d425e36ac/go.mod h1:mT/Pg3utrbYy9K9Pvim0/n5lsz9qkrw9q+04jOXxx1I=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
 golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b h1:lAZ0/chPUDWwjqosYR0X4M490zQhMsiJ4K3DbA7o+3g=
