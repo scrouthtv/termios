@@ -39,6 +39,9 @@ const (
 type Spectrum uint8
 
 const (
+	// SpectrumDefault only has one color: the terminal's default color.
+	SpectrumDefault Spectrum = 0
+
 	// Spectrum8 indicates that the spectrum has 8 colors.
 	// It usually includes red, blue, green and binary combinations of these.
 	// It needs 3 bits of storage.
@@ -59,3 +62,8 @@ const (
 	// It takes 24 bits of storage.
 	SpectrumRGB Spectrum = 4
 )
+
+// MoreThan tests whether this spectrum has *more* colors than the other.
+func (s *Spectrum) MoreThan(other *Spectrum) bool {
+	return uint8(*s) > uint8(*other)
+}

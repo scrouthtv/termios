@@ -11,6 +11,9 @@ type Color struct {
 }
 
 var (
+	// ColorDefault resets the terminal to the default color.
+	ColorDefault Color = Color{SpectrumDefault, 0, 0, 0}
+
 	// ColorBlack is the black color.
 	ColorBlack Color = Color{Spectrum8, 0, 0, 0}
 
@@ -34,6 +37,30 @@ var (
 
 	// ColorWhite is the white color, mixed from red, green and blue.
 	ColorWhite Color = Color{Spectrum8, 7, 0, 0}
+
+	// ColorDarkGray is the black color.
+	ColorDarkGray Color = Color{Spectrum16, 8, 0, 0}
+
+	// ColorLightRed is the red color.
+	ColorLightRed Color = Color{Spectrum16, 9, 0, 0}
+
+	// ColorLightGreen is the green color.
+	ColorLightGreen Color = Color{Spectrum16, 10, 0, 0}
+
+	// ColorLightYellow is the yellow color, mixed from red and green.
+	ColorLightYellow Color = Color{Spectrum16, 11, 0, 0}
+
+	// ColorLightBlue is the blue color.
+	ColorLightBlue Color = Color{Spectrum16, 12, 0, 0}
+
+	// ColorLightMagenta is the magenta color, mixed from red and blue.
+	ColorLightMagenta Color = Color{Spectrum16, 13, 0, 0}
+
+	// ColorLightCyan is the cyan color, mixed from green and blue.
+	ColorLightCyan Color = Color{Spectrum16, 14, 0, 0}
+
+	// ColorLightGray is the white color, mixed from red, green and blue.
+	ColorLightGray Color = Color{Spectrum16, 15, 0, 0}
 )
 
 // Spectrum returns the spectrum of a color.
