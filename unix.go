@@ -7,8 +7,6 @@ package termios
 import (
 	"os"
 	"os/signal"
-	"strconv"
-	"fmt"
 	"strings"
 
 	"golang.org/x/sys/unix"
@@ -179,68 +177,12 @@ func (t *nixTerm) SetStyle(s Style) {
 
 	var escape strings.Builder
 	escape.WriteString("\x1b[")
-	escape.WriteString(t.colorToCode(&s.Foreground, true))
+	escape.WriteString(colorToEscapeCode(&s.Foreground, true))
 	escape.WriteString(";")
-	escape.WriteString(t.colorToCode(&s.Background, false))
+	escape.WriteString(colorToEscapeCode(&s.Background, false))
 	escape.WriteString("m")
 
 	t.WriteString(escape.String())
-}
-
-func (t *nixTerm) colorToCode(c *Color, isFg bool) string {
-	if c.Spectrum() == SpectrumDefault {
-		return t.defaultColorcode(isFg)
-	} else if c.Spectrum() == Spectrum8 {
-		return t.color8ToCode(c.basic, isFg)
-	} else if c.Spectrum() == Spectrum16 {
-		return t.color16ToCode(c.basic, isFg)
-	} else if c.Spectrum() == Spectrum256 {
-		return t.color256ToCode(c.basic, isFg)
-	} else if c.Spectrum() == SpectrumRGB {
-		return t.colorRGBToCode(c.basic, c.green, c.blue, isFg)
-	} else {
-		panic("not supported")
-	}
-}
-
-func (t *nixTerm) defaultColorcode(isFg bool) string {
-	if isFg {
-		return "39"
-	} else {
-		return "49"
-	}
-}
-
-func (t *nixTerm) color8ToCode(value uint8, isFg bool) string {
-	if isFg {
-		return "3" + strconv.FormatUint(uint64(value), 10)
-	} else {
-		return "4" + strconv.FormatUint(uint64(value), 10)
-	}
-}
-
-func (t *nixTerm) color16ToCode(value uint8, isFg bool) string {
-	if isFg {
-		return "9" + strconv.FormatUint(uint64(value - 8), 10)
-	} else {
-		return "10" + strconv.FormatUint(uint64(value - 8), 10)
-	}
-}
-
-func (t *nixTerm) color256ToCode(value uint8, isFg bool) string {
-	if isFg {
-		return "38;5;" + strconv.FormatUint(uint64(value), 10)
-	} else {
-		return "48;5;" + strconv.FormatUint(uint64(value), 10)
-	}
-}
-
-func (t *nixTerm) colorRGBToCode(r uint8, g uint8, b uint8, isFg bool) string {
-	if isFg {
-		return fmt.Sprintf("38;2;%d;%d;%d", r, g, b)
-	} else {
-		return fmt.Sprintf("48;2;%d;%d;%d", r, g, b)
-	}
 }
 
 func (t *nixTerm) Write(p []byte) (int, error) {
