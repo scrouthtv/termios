@@ -20,7 +20,9 @@ Tag `v3.2` adds the `GetSize()` functionality. It's return value is implementati
 
 In `v3.3`, the `SetRaw()` functionality was reintroduced. 
 
-Tag `v4.0` introduced the `Style` and `Color` type. Every terminal is able set its style to one that as closely as possible resembles the specified style (e. g. before Windows 10 there were only 16 colors).
+Tag `v4.0` introduced the `Style` and `Color` type. Every terminal is able set its style to one that as closely as possible resembles the specified style, but may not be able to display exactly the specified style (e. g. before Windows 10 there were only 16 colors).
+ - 8 and 16 color constants are defined in the `style.go`. 
+ - 256 color constants are named in color256.go. They look like [this](https://jonasjacek.github.io/colors/).
 
 The unix implementation waits for the signal SIGWINCH and reads the new window size using ioctl.
 
