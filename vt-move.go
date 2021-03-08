@@ -29,8 +29,8 @@ func (vt *vt) move(m *Movement) error {
 			}
 		}
 	case vertAbs:
-		pos, err := vt.term.GetPosition()
-		if err != nil {
+		pos, perr := vt.term.GetPosition()
+		if perr != nil {
 			return &IOError{"reading current position", err}
 		}
 
@@ -39,7 +39,7 @@ func (vt *vt) move(m *Movement) error {
 			newx = 0
 		}
 
-		err = vt.moveTo(newx, m.y) //nolint:ineffassign,staticcheck,wastedassign // false positive
+		err = vt.moveTo(newx, m.y)
 	case 0:
 		err = vt.moveHoriz(m.x)
 		if err != nil {
