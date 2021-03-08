@@ -11,7 +11,7 @@ type wincon struct {
 }
 
 func (a *wincon) setStyle(s Style) error {
-	panic("todo")
+	panic("todo") // TODO
 	return nil
 }
 
@@ -20,10 +20,10 @@ func (a *wincon) mapColorToWindows(isfg bool, c Color) bwin.Attribute {
 	switch value {
 	case ColorDefault.basic:
 		if isfg {
-			panic("todo") // test is this the actual default color
+			panic("todo") // TODO test is this the actual default color
 			return bwin.ForegroundBlue | bwin.ForegroundGreen | bwin.ForegroundRed | bwin.ForegroundIntensity
 		} else {
-			panic("todo")
+			panic("todo") // TODO
 			return 0
 		}
 	case ColorBlack.basic:
@@ -59,32 +59,32 @@ func (a *wincon) mapColorToWindows(isfg bool, c Color) bwin.Attribute {
 			return bwin.BackgroundRed | bwin.BackgroundBlue
 		}
 	default:
-		panic("todo")
+		panic("todo") // TODO
 	}
 	return 0
 }
 
 func (a *wincon) clear() error {
-	panic("todo")
+	panic("todo") // TODO
 	return nil
 }
 
 func (a *wincon) getPosition() (*Position, error) {
-	panic("todo")
+	panic("todo") // TODO
 	return nil, nil
 }
 
 func (a *wincon) clearLine(c ClearType) error {
-	panic("todo")
+	panic("todo") // TODO
 	return nil
 }
 
 func (a *wincon) clearScreen(c ClearType) error {
-	panic("todo")
+	panic("todo") // TODO
 	return nil
 }
 
 func (a *wincon) move(m *Movement) error {
-	panic("todo")
+	panic("todo") // TODO
 	return nil
 }

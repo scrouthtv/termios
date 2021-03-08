@@ -23,12 +23,12 @@ func (vt *vt) move(m *Movement) error {
 			if m.y > 0 {
 				_, err = fmt.Fprintf(vt.term, "\x1b[%dB", m.y) // down m.y lines
 				if err != nil {
-					return err
+					return &IOError{"reading current position", err}
 				}
 			} else if m.y < 0 {
 				_, err = fmt.Fprintf(vt.term, "\x1b[%dA", -m.y) // up -m.y lines
 				if err != nil {
-					return err
+					return &IOError{"reading current position", err}
 				}
 			}
 			_, err = fmt.Fprintf(vt.term, "\x1b[%dG", m.x) // move to column m.x
@@ -38,7 +38,7 @@ func (vt *vt) move(m *Movement) error {
 	} else if m.flags == vertAbs {
 		pos, err := vt.term.GetPosition()
 		if err != nil {
-			return err
+			return &IOError{"reading current position", err}
 		}
 		newx := pos.X + m.x
 		if newx < 0 {
@@ -49,12 +49,12 @@ func (vt *vt) move(m *Movement) error {
 		if m.x > 0 {
 			_, err = fmt.Fprintf(vt.term, "\x1b[%dC", m.x) // move forward by m.x
 			if err != nil {
-				return err
+				return &IOError{"writing new position", err}
 			}
 		} else if m.x < 0 {
 			_, err = fmt.Fprintf(vt.term, "\x1b[%dD", -m.x) // move backwards by -m.x
 			if err != nil {
-				return err
+				return &IOError{"writing new position", err}
 			}
 		}
 
@@ -65,7 +65,10 @@ func (vt *vt) move(m *Movement) error {
 		}
 	}
 
-	return err
+	if err != nil {
+		return &IOError{"writing new position", err}
+	}
+	return nil
 }
 
 func (vt *vt) clearScreen(c ClearType) error {
@@ -82,7 +85,10 @@ func (vt *vt) clearScreen(c ClearType) error {
 		err = &InvalidClearTypeError{c}
 	}
 
-	return err
+	if err != nil {
+		return &IOError{"clearing screen", err}
+	}
+	return nil
 }
 
 func (vt *vt) clearLine(c ClearType) error {
@@ -99,14 +105,22 @@ func (vt *vt) clearLine(c ClearType) error {
 		err = &InvalidClearTypeError{c}
 	}
 
-	return err
+	if err != nil {
+		return &IOError{"clearing screen", err}
+	}
+	return nil
 }
 
 func (vt *vt) getPosition() (*Position, error) {
+	_, err := vt.term.Write([]byte{ 0x1b, 0x5b, 0x36, 0x6e, 0x0b })
+	if err != nil {
+		return nil, &IOError{"", err}
+	}
+
 	p := make([]byte, 32)
 	n, err := vt.term.readback(p)
 	if err != nil {
-		return nil, err
+		return nil, &IOError{"reading current position", err}
 	}
 	if n < 6 {
 		return nil, &InvalidResponseError{"reading position", string(p[:n])}
@@ -123,11 +137,11 @@ func (vt *vt) getPosition() (*Position, error) {
 
 	x, err := strconv.Atoi(pos[0])
 	if err != nil {
-		return nil, err
+		return nil, &InvalidResponseError{"reading position", string(p[:n])}
 	}
 	y, err := strconv.Atoi(pos[1])
 	if err != nil {
-		return nil, err
+		return nil, &InvalidResponseError{"reading position", string(p[:n])}
 	}
 
 	return &Position{x, y}, nil

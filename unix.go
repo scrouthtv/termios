@@ -15,7 +15,7 @@ const ioBufSize int = 128
 
 type unixParser interface {
 	open()
-	close()
+	exit()
 	asKey(in []byte) []Key
 }
 
@@ -42,26 +42,27 @@ func Open() (Terminal, error) {
 	// TODO: https://github.com/nsf/termbox-go/blob/master/api.go opens /dev/tty as rdwr on bsd?
 	in, err = unix.Open("/dev/tty", unix.O_RDONLY, 0)
 	if err != nil {
-		return nil, err
+		return nil, &IOError{"opening stdin", err}
 	}
 
 	out, err = unix.Open("/dev/tty", unix.O_WRONLY, 0)
 	if err != nil {
 		unix.Close(out)
-		return nil, err
+		return nil, &IOError{"opening stdout", err}
 	}
 
 	// save old termios
 	var mode *unix.Termios
 	mode, err = unix.IoctlGetTermios(in, reqGetTermios)
+
 	if err != nil {
 		unix.Close(in)
 		unix.Close(out)
 		return nil, err
 	}
 
-	var sCh chan os.Signal = make(chan os.Signal, 1)
-	var closer chan bool = make(chan bool, 1)
+	sCh := make(chan os.Signal, 1)
+	closer := make(chan bool, 1)
 
 	signal.Notify(sCh, unix.SIGWINCH)
 
@@ -69,16 +70,16 @@ func Open() (Terminal, error) {
 		TermSize{0, 0}, sCh, closer, nil}
 	t.vt = &vt{&t}
 
-	var p unixParser
-	p, err = newParser(&t)
+	p, err := newParser(&t)
 	if err != nil {
 		return nil, err
 	}
+
 	t.p = p
 
 	p.open()
-
 	t.readSize()
+
 	go t.signalHandler()
 
 	return &t, nil
@@ -90,7 +91,7 @@ func (t *nixTerm) SetRaw(raw bool) error {
 
 	mode, err = unix.IoctlGetTermios(t.in, reqGetTermios)
 	if err != nil {
-		return err
+		return &IOError{"reading termios", err}
 	}
 
 	if raw {
@@ -113,6 +114,7 @@ func (t *nixTerm) SetRaw(raw bool) error {
 		unix.Close(t.out)
 		return err
 	}
+
 	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
 	if err != nil {
 		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
@@ -158,14 +160,12 @@ func (t *nixTerm) GetSize() TermSize {
 }
 
 func (t *nixTerm) Read() ([]Key, error) {
-	var err error
-	var n int
-	n, err = unix.Read(t.in, t.inBuf)
+	n, err := unix.Read(t.in, t.inBuf)
 	if err != nil {
-		return nil, err
-	} else {
-		return t.p.asKey(t.inBuf[:n]), nil
+		return nil, &IOError{"reading terminal input", err}
 	}
+
+	return t.p.asKey(t.inBuf[:n]), nil
 }
 
 // SetStyle sets the specified style onto the terminal.
@@ -198,7 +198,7 @@ func (t *nixTerm) Close() {
 
 	t.ready = false
 
-	t.p.close()
+	t.p.exit()
 
 	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)
 	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode)
@@ -213,7 +213,7 @@ func (t *nixTerm) Close() {
 func (t *nixTerm) readback(p []byte) (int, error) {
 	oldmode, err := unix.IoctlGetTermios(t.in, reqGetTermios)
 	if err != nil {
-		return 0, err
+		return 0, &IOError{"reading terminal input", err}
 	}
 
 	rawmode := *oldmode
@@ -221,33 +221,46 @@ func (t *nixTerm) readback(p []byte) (int, error) {
 
 	err = unix.IoctlSetTermios(t.in, reqSetTermios, &rawmode)
 	if err != nil {
-		return 0, err
-	}
-	err = unix.IoctlSetTermios(t.in, reqSetTermios, &rawmode)
-	if err != nil {
-		return 0, err
+		return 0, &IOError{"setting termios", err}
 	}
 
-	_, err = t.Write([]byte{ 0x1b, 0x5b, 0x36, 0x6e, 0x0b })
+	err = unix.IoctlSetTermios(t.in, reqSetTermios, &rawmode)
 	if err != nil {
-		return 0, err
+		return 0, &IOError{"setting termios", err}
 	}
 
 	n, err := unix.Read(t.in, p)
 	if err != nil {
-		return 0, err
+		return 0, &IOError{"reading from terminal", err}
 	}
 
 	err = unix.IoctlSetTermios(t.in, reqSetTermios, oldmode)
 	if err != nil {
-		return 0, err
-	}
-	err = unix.IoctlSetTermios(t.in, reqSetTermios, oldmode)
-	if err != nil {
-		return 0, err
+		return 0, &IOError{"setting termios", err}
 	}
 
-	return n, err
+	err = unix.IoctlSetTermios(t.in, reqSetTermios, oldmode)
+	if err != nil {
+		return 0, &IOError{"setting termios", err}
+	}
+
+	return n, nil
+}
+
+func newParser(parent *nixTerm) (unixParser, error) {
+	if os.Getenv("TERM") == "xterm" {
+		panic("todo") // TODO
+	}
+
+	if os.Getenv("TERM") == "xterm" {
+		return &xtermParser{parent}, nil
+	}
+
+	i, err := loadTerminfo()
+	if err != nil {
+		return nil, err
+	}
+	return &linuxParser{parent, i}, nil
 }
 
 func (t *nixTerm) ClearScreen(c ClearType) error {

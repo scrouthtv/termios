@@ -25,17 +25,18 @@ func (vt *vt) setStyle(s Style) error {
 }
 
 func (vt *vt) colorToEscapeCode(c *Color, isFg bool) string {
-	if c.Spectrum() == SpectrumDefault {
+	switch c.Spectrum() {
+	case SpectrumDefault:
 		return vt.defaultColorEscapeCode(isFg)
-	} else if c.Spectrum() == Spectrum8 {
+	case Spectrum8:
 		return vt.color8ToEscapeCode(c.basic, isFg)
-	} else if c.Spectrum() == Spectrum16 {
+	case Spectrum16:
 		return vt.color16ToEscapeCode(c.basic, isFg)
-	} else if c.Spectrum() == Spectrum256 {
+	case Spectrum256:
 		return vt.color256ToEscapeCode(c.basic, isFg)
-	} else if c.Spectrum() == SpectrumRGB {
+	case SpectrumRGB:
 		return vt.colorRGBToEscapeCode(c.basic, c.green, c.blue, isFg)
-	} else {
+	default:
 		panic("not supported")
 	}
 }

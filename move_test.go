@@ -11,6 +11,7 @@ func TestClearLine(t *testing.T) {
 
 	term.Move(MoveTo(0, 0).SetUp(0))
 	size := term.GetSize()
+
 	var i uint16
 	for i = 0; i < size.Width; i++ {
 		term.Write([]byte{ 'o' })

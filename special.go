@@ -34,7 +34,7 @@ const (
 	SpecialEscape
 )
 
-var specialNames []string = []string{
+var specialNames = []string{
 	"backspace", "delete", "enter", "cursor left", "cursor right", "cursor up", "cursor down",
 	"home", "end", "page up", "page down", "insert",
 	"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",

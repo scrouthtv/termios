@@ -101,16 +101,16 @@ func loadTerminfo() (*info, error) {
 		i.actions[ActionExit] = caps["rmkx"]
 
 		return i, nil
+	}
+
+	// If that does not work, try to load a builtin info:
+	i = loadBuiltinTerminfo()
+	if i != nil {
+		// If that works, return it:
+		return i, nil
 	} else {
-		// If that does not work, try to load a builtin info:
-		i = loadBuiltinTerminfo()
-		if i != nil {
-			// If that works, return it:
-			return i, nil
-		} else {
-			// If not (e. g. there is no built-in for this terminal), return the first error
-			return nil, err
-		}
+		// If not (e. g. there is no built-in for this terminal), return the first error
+		return nil, err
 	}
 }
 

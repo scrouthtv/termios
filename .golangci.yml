@@ -43,4 +43,4 @@ linters-settings:
 
 linters:
   enable-all: true
-  disable: nlreturn,ifshort,nolintlint,tparallel,paralleltest,testpackage,gci,scopelint,gochecknoglobals,interfacer,maligned
+  disable: nlreturn,ifshort,nolintlint,tparallel,paralleltest,testpackage,gci,scopelint,gochecknoglobals,interfacer,maligned,revive,golint

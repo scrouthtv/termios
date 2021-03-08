@@ -24,18 +24,38 @@ func Test8Color(t *testing.T) {
 
 	for fg, fgname := range names {
 		for bg, bgname := range names {
-			term.SetStyle(Style{values[fg], values[bg], 0})
+			err = term.SetStyle(Style{values[fg], values[bg], 0})
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			if len(fgname) > 3 {
 				fgname = fgname[:3]
 			}
+
 			if len(bgname) > 3 {
 				bgname = bgname[:3]
 			}
-			term.WriteString(fmt.Sprintf("%3s on %3s", fgname, bgname))
-			term.SetStyle(Style{ColorDefault, ColorDefault, 0})
-			term.WriteString(" ")
+
+			_, err = term.WriteString(fmt.Sprintf("%3s on %3s", fgname, bgname))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = term.SetStyle(Style{ColorDefault, ColorDefault, 0})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			_, err = term.WriteString(" ")
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
-		term.WriteString("\r\n")
+		_, err = term.WriteString("\r\n")
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	term.Close()

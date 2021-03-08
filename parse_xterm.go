@@ -21,7 +21,8 @@ import (
 //  - Dickey has an article bashing Evans: https://invisible-island.net/xterm/modified-keys.html
 //  - Evans has an article bashing Dickey: http://www.leonerd.org.uk/hacks/fixterms/
 
-// Then there's a manual of 49 pages that has some technical details: https://invisible-island.net/xterm/ctlseqs/ctlseqs.pdf
+// Then there's a manual of 49 pages that has some technical details:
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.pdf
 // Key words: modifyKeyboard, modifyOtherKeys, altSendsEscape
 
 type xtermParser struct {
@@ -34,17 +35,19 @@ func (p *xtermParser) open() {
 	for _, i := range []byte{'0', '1', '2', '4'} {
 		s.Write([]byte{0x1b, '[', '>', i, ';', '1', 'm'})
 	}
+
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'h'})
 
 	p.parent.WriteString(s.String())
 }
 
-func (p *xtermParser) close() {
+func (p *xtermParser) exit() {
 	var s strings.Builder
 
 	for _, i := range []byte{'0', '1', '2', '4'} {
 		s.Write([]byte{0x1b, '[', '>', i, ';', '0', 'm'})
 	}
+
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'l'})
 
 	p.parent.WriteString(s.String())
@@ -55,9 +58,11 @@ func (p *xtermParser) asKey(in []byte) []Key {
 
 	if doDebug {
 		os.Stdout.WriteString("Have to parse [ ")
+
 		for _, b := range in {
 			os.Stdout.WriteString(fmt.Sprintf("0x%x ", b))
 		}
+
 		os.Stdout.WriteString("]\r\n")
 	}
 
