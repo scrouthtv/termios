@@ -47,7 +47,7 @@ func (vt *vt) move(m *Movement) error {
 		}
 		fmt.Fprintf(logger, "newx: %d\n", newx)
 
-		err = vt.moveTo(m.x, m.y)
+		err = vt.moveTo(newx, m.y)
 	case 0:
 		err = vt.moveHoriz(m.x)
 		if err != nil {
