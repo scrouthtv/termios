@@ -2,14 +2,7 @@ package termios
 
 import (
 	"fmt"
-	"os"
 )
-
-var logger *os.File
-
-func init() {
-	logger, _ = os.Create("/tmp/movement.log")
-}
 
 // move executes the movement by mapping it to one or more of the low-level movement
 // escape codes.
@@ -20,7 +13,7 @@ func (vt *vt) move(m *Movement) error {
 	case horizAbs | vertAbs:
 		err = vt.moveTo(m.x, m.y)
 	case horizAbs:
-		if m.flags == horizAbs && m.x == 0 && m.y == 0 {
+		if m.x == 0 && m.y == 0 {
 			_, err = vt.term.Write([]byte{0x0d}) // CR
 		} else {
 			if m.x == 0 {
@@ -45,9 +38,8 @@ func (vt *vt) move(m *Movement) error {
 		if newx < 0 {
 			newx = 0
 		}
-		fmt.Fprintf(logger, "newx: %d\n", newx)
 
-		err = vt.moveTo(newx, m.y)
+		err = vt.moveTo(newx, m.y) //nolint:ineffassign,staticcheck,wastedassign // false positive
 	case 0:
 		err = vt.moveHoriz(m.x)
 		if err != nil {
@@ -83,7 +75,7 @@ func (vt *vt) moveHoriz(x int) error {
 		_, err = fmt.Fprintf(vt.term, "\x1b[%dD", -x)
 	}
 
-	return err  //nolint:wrapcheck // internal routine
+	return err //nolint:wrapcheck // internal routine
 }
 
 func (vt *vt) moveToColumn(x int) error {
