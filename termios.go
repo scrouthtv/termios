@@ -45,6 +45,8 @@ type Terminal interface {
 	// Implementations will not cross line borders if the provided horizontal movement exceeds line width.
 	Move(*Movement) error
 
+	// Clear clears the entire screen.
+	Clear() error
 }
 
 type Position struct {

@@ -286,6 +286,11 @@ func (t *nixTerm) Move(m *Movement) error {
 	return err
 }
 
+func (t *nixTerm) Clear() error {
+	_, err := t.WriteString("\x1b[2J")
+	return err
+}
+
 func (t *nixTerm) GetPosition() (*Position, error) {
 	oldmode, err := unix.IoctlGetTermios(t.in, reqGetTermios)
 	if err != nil {

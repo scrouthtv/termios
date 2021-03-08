@@ -2,12 +2,35 @@ package termios
 
 import "testing"
 
+// Output of TestMovement should look like this:
+/*
+ASDF
+
+moooooooooooom
+get the camera
+
+     I'm hacking
+    I'm actually hacking
+
+
+          Somewhere
+              over the rainbow
+
+
+       uvwxyz
+     abcdefgh
+     ijklmn
+
+--- PASS: TestMovement (0.03s)
+*/
+
 func TestMovement(t *testing.T) {
 	term, err := Open()
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	term.Clear()
 	term.Move(MoveTo(1, 1))
 	term.WriteString("asdf")
 	term.Move(MoveBy(0, 0).SetColumn(0))
