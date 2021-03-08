@@ -4,7 +4,7 @@ package termios
 
 import (
 	"golang.org/x/sys/windows"
-	"github.com/scrouthtv/termios/bwin"
+	"termios/bwin"
 )
 
 type winTerm struct {
@@ -16,10 +16,6 @@ type winTerm struct {
 	oldOutMode uint32
 	p          *winParser
 	a          actor
-}
-
-type actor interface {
-	setStyle(Style)
 }
 
 // Open opens a new terminal for raw i/o
@@ -56,7 +52,12 @@ func Open() (Terminal, error) {
 
 	var t winTerm = winTerm{in, out, true, false, inMode, outMode, nil, nil}
 
-	t.a = &oldActor{&t}
+	// TODO do we support VT codes instead?
+	t.a = &wincon{&t}
+
+	if false {
+		t.a = &vt{&t}
+	}
 
 	var p *winParser
 	p, err = newParser(&t)
@@ -103,14 +104,14 @@ func (t *winTerm) IsOpen() bool {
 }
 
 func (t *winTerm) Read() ([]Key, error) {
-	var iR InputRecord
+	var iR bwin.InputRecord
 	var err error
 	var read uint32
 	var k *Key
 
 	// wait for the first valid input:
 	for k == nil {
-		err = ReadConsoleInput(t.in, &iR, 1, &read)
+		err = bwin.ReadConsoleInput(t.in, &iR, 1, &read)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +124,7 @@ func (t *winTerm) Read() ([]Key, error) {
 	return []Key{*t.p.asKey(iR)}, nil
 }
 
-func (t *winTerm) SetStyle(s Style) {
+func (t *winTerm) SetStyle(s Style) error {
 	return t.a.setStyle(s)
 }
 
@@ -158,4 +159,16 @@ func (t *winTerm) Close() {
 
 	t.in = windows.InvalidHandle
 	t.out = windows.InvalidHandle
+}
+
+func (t *winTerm) Clear() error {
+	return t.a.clear()
+}
+
+func (t *winTerm) GetPosition() (*Position, error) {
+	return t.a.getPosition()
+}
+
+func (t *winTerm) Move(m *Movement) error {
+	return t.a.move(m)
 }

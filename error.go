@@ -19,3 +19,11 @@ type InvalidResponseError struct {
 func (e *InvalidResponseError) Error() string {
 	return fmt.Sprintf("invalid reponse from terminal for %s: %q", e.id, e.resp)
 }
+
+type InvalidClearTypeError struct {
+	ct ClearType
+}
+
+func (e *InvalidClearTypeError) Error() string {
+	return "invalid cleartype " + strconv.FormatUint(uint64(e.ct), 10)
+}

@@ -15,6 +15,10 @@ type Terminal interface {
 	// to be sent to the application.
 	Read() ([]Key, error)
 
+	// readback reads a single byte sequence in raw mode.
+	// It is used to send escape codes to the terminal and read the answer.
+	readback([]byte) (int, error)
+
 	// WriteString writes the specified string at the current position into the terminal
 	// It returns the number of bytes (there may be multiple bytes in a character) written
 	// or an error.
@@ -36,7 +40,7 @@ type Terminal interface {
 	GetSize() TermSize
 
 	// SetStyle sets the terminal style. Not all terminals support all styles (e. g. 24bit colors).
-	SetStyle(Style)
+	SetStyle(Style) error
 
 	// GetPosition returns the current cursor position. On some terminals, this takes some time.
 	GetPosition() (*Position, error)
@@ -45,9 +49,19 @@ type Terminal interface {
 	// Implementations will not cross line borders if the provided horizontal movement exceeds line width.
 	Move(*Movement) error
 
-	// Clear clears the entire screen.
-	Clear() error
+	// ClearScreen clears the screen depending on the ClearType.
+	ClearScreen(ClearType) error
+
+	// ClearLine clears this line depending on the ClearType.
+	ClearLine(ClearType) error
 }
+
+type ClearType uint8
+const (
+	ClearToEnd ClearType = iota
+	ClearToStart ClearType = iota
+	ClearCompletely ClearType = iota
+)
 
 type Position struct {
 	X int
@@ -58,4 +72,16 @@ type Position struct {
 type TermSize struct {
 	Width  uint16
 	Height uint16
+}
+
+// actor does many operations on the terminal.
+// It is implemented by `vt` and `wincon`.
+// All unix terminals should use the `vt` implementation,
+// while for Windows terminals the correct implementation
+// is determined at runtime
+type actor interface {
+	setStyle(Style) error
+	clearScreen(ClearType) error
+	clearLine(ClearType) error
+	getPosition() (*Position, error)
 }

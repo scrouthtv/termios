@@ -5,9 +5,8 @@ package termios
 // parse_win.go contains functionality for reading a Key from an InputRecord on Windows.
 
 import (
-	"fmt"
-	"strings"
 	"unicode"
+	"termios/bwin"
 )
 
 type winParser struct {
@@ -56,7 +55,7 @@ func init() {
 	vkCodes[0x7b] = SpecialF12
 }
 
-func (p *winParser) asKey(i InputRecord) *Key {
+func (p *winParser) asKey(i bwin.InputRecord) *Key {
 	if i.Type != 0x1 {
 		// ignore everything but keys
 		return nil
@@ -124,17 +123,4 @@ func (p *winParser) asKey(i InputRecord) *Key {
 	}
 
 	return nil
-}
-
-// FIXME: remove this method
-func (r *InputRecord) String() string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("Type: %d\n\r", r.Type))
-	sb.WriteString("Data: ")
-	for _, b := range r.Data {
-		sb.WriteString(fmt.Sprintf("0x%x ", b))
-	}
-	sb.WriteString("\n\r")
-
-	return sb.String()
 }

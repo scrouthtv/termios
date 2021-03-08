@@ -2,6 +2,60 @@ package termios
 
 import "testing"
 
+func TestClearLine(t *testing.T) {
+	term, err := Open()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer term.Close()
+
+	term.Move(MoveTo(0, 0).SetUp(0))
+	size := term.GetSize()
+	var i uint16
+	for i = 0; i < size.Width; i++ {
+		term.Write([]byte{ 'o' })
+	}
+
+	term.Move(MoveBy(-50, 0))
+	term.WriteString("press enter to clear to end")
+	term.Read()
+	term.Move(MoveBy(30, -1))
+	term.ClearLine(ClearToEnd)
+	term.Read()
+}
+
+func TestClearScreen(t *testing.T) {
+	term, err := Open()
+	if err != nil {
+		t.Fatal(err)
+	}
+	term.ClearScreen(ClearCompletely)
+	term.Move(MoveTo(1, 1))
+
+	size := term.GetSize()
+	var i uint16
+	for i = 0; i < size.Height * size.Width; i++ {
+		term.Write([]byte{ 'x' })
+	}
+
+	term.Move(MoveTo(int(size.Width / 3), int(size.Height / 2)))
+	term.WriteString("Press any key to clear from here down.")
+	term.Read()
+	term.ClearScreen(ClearToEnd)
+	term.Read()
+
+	for i = 0; i < size.Height * size.Width; i++ {
+		term.Write([]byte{ 'x' })
+	}
+	term.Move(MoveTo(int(size.Width / 3), int(size.Height / 2)))
+	term.WriteString("Press any key to clear from here down.")
+	term.Read()
+	term.ClearScreen(ClearToStart)
+	term.Read()
+
+	term.Close()
+}
+
 // Output of TestMovement should look like this:
 /*
 ASDF
@@ -30,7 +84,7 @@ func TestMovement(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	term.Clear()
+	term.ClearScreen(ClearCompletely)
 	term.Move(MoveTo(1, 1))
 	term.WriteString("asdf")
 	term.Move(MoveBy(0, 0).SetColumn(0))
