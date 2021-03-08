@@ -34,8 +34,10 @@ const (
 	ModShift
 )
 
-var keyNames = []string{"letter", "special", "invalid"}
-var modNames = []string{"ctrl", "alt", "shift"}
+var (
+	keyNames = []string{"letter", "special", "invalid"}
+	modNames = []string{"ctrl", "alt", "shift"}
+)
 
 func (k *Key) String() string {
 	if *k == InvalidKey {

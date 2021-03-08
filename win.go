@@ -3,8 +3,8 @@
 package termios
 
 import (
-	"golang.org/x/sys/windows"
 	"github.com/scrouthtv/termios/bwin"
+	"golang.org/x/sys/windows"
 )
 
 type winTerm struct {

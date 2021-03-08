@@ -29,7 +29,7 @@ type nixTerm struct {
 	size    TermSize
 	sCh     chan os.Signal
 	closer  chan bool // send true through closer to indicate that this terminal is going down
-	vt			actor
+	vt      actor
 }
 
 // Open opens a new terminal for raw i/o
@@ -66,8 +66,11 @@ func Open() (Terminal, error) {
 
 	signal.Notify(sCh, unix.SIGWINCH)
 
-	var t nixTerm = nixTerm{in, out, true, *mode, nil, make([]byte, ioBufSize),
-		TermSize{0, 0}, sCh, closer, nil}
+	var t nixTerm = nixTerm{
+		in, out, true, *mode, nil, make([]byte, ioBufSize),
+		TermSize{0, 0},
+		sCh, closer, nil,
+	}
 	t.vt = &vt{&t}
 
 	p, err := newParser(&t)
@@ -278,4 +281,3 @@ func (t *nixTerm) Move(m *Movement) error {
 func (t *nixTerm) GetPosition() (*Position, error) {
 	return t.vt.getPosition()
 }
-

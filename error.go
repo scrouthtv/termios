@@ -1,7 +1,9 @@
 package termios
 
-import "strconv"
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type InvalidMovementError struct {
 	value int
@@ -12,7 +14,7 @@ func (e *InvalidMovementError) Error() string {
 }
 
 type InvalidResponseError struct {
-	id string
+	id   string
 	resp string
 }
 
@@ -30,7 +32,7 @@ func (e *InvalidClearTypeError) Error() string {
 
 type IOError struct {
 	step string
-	err error
+	err  error
 }
 
 func (e *IOError) Error() string {

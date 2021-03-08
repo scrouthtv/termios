@@ -1,7 +1,9 @@
 package termios
 
-import "strings"
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Movement struct {
 	flags uint8
@@ -77,7 +79,7 @@ func (m *Movement) SetLeft(n int) *Movement {
 func (m *Movement) String() string {
 	var out strings.Builder
 
-	if m.flags | horizAbs != 0 {
+	if m.flags|horizAbs != 0 {
 		fmt.Fprintf(&out, "moves to column %d", m.x)
 	} else {
 		if m.x > 0 {
@@ -87,7 +89,7 @@ func (m *Movement) String() string {
 		}
 	}
 
-	if m.flags | horizAbs != 0 {
+	if m.flags|horizAbs != 0 {
 		fmt.Fprintf(&out, "and to row %d", m.y)
 	} else {
 		if m.y > 0 {

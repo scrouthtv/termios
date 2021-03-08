@@ -1,15 +1,17 @@
 package termios
 
-import "fmt"
-import "strings"
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 func (vt *vt) move(m *Movement) error {
 	var err error
 
 	if m.flags == horizAbs && m.x == 0 && m.y == 0 {
-		_, err = vt.term.Write([]byte{ 0x0d }) // CR
-	} else  if m.flags == horizAbs {
+		_, err = vt.term.Write([]byte{0x0d}) // CR
+	} else if m.flags == horizAbs {
 		if m.x == 0 {
 			if m.y > 0 {
 				_, err = fmt.Fprintf(vt.term, "\x1b[%dE", m.y) // move to beginning of m.y lines down
@@ -33,8 +35,8 @@ func (vt *vt) move(m *Movement) error {
 			}
 			_, err = fmt.Fprintf(vt.term, "\x1b[%dG", m.x) // move to column m.x
 		}
-	} else if m.flags == horizAbs | vertAbs {
-			_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, m.x) // move to position m.x / m.y
+	} else if m.flags == horizAbs|vertAbs {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, m.x) // move to position m.x / m.y
 	} else if m.flags == vertAbs {
 		pos, err := vt.term.GetPosition()
 		if err != nil {
@@ -112,7 +114,7 @@ func (vt *vt) clearLine(c ClearType) error {
 }
 
 func (vt *vt) getPosition() (*Position, error) {
-	_, err := vt.term.Write([]byte{ 0x1b, 0x5b, 0x36, 0x6e, 0x0b })
+	_, err := vt.term.Write([]byte{0x1b, 0x5b, 0x36, 0x6e, 0x0b})
 	if err != nil {
 		return nil, &IOError{"", err}
 	}

@@ -6,6 +6,7 @@ package termios
 
 import (
 	"unicode"
+
 	"github.com/scrouthtv/termios/bwin"
 )
 

@@ -4,10 +4,12 @@ package termios
 
 // parse_linux.go contains functionality for reading a Key from a []byte input on Unix.
 
-import "os"
-import "fmt"
-import "unicode"
-import "unicode/utf8"
+import (
+	"fmt"
+	"os"
+	"unicode"
+	"unicode/utf8"
+)
 
 // linuxParser is the default parser for linux terminals that should always work.
 // It compares entered key sequences to a terminfo (either on disk or built-in)

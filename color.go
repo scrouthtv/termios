@@ -75,6 +75,6 @@ func (c *Color) Downsample(target Spectrum) *Color {
 		return c
 	}
 
-	// TODO 
+	// TODO
 	return nil
 }

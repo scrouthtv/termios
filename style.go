@@ -5,7 +5,7 @@ package termios
 type Style struct {
 	Foreground Color
 	Background Color
-	Extras TextAttribute
+	Extras     TextAttribute
 }
 
 // TextAttribute sets more styling options on text.

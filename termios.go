@@ -57,9 +57,10 @@ type Terminal interface {
 }
 
 type ClearType uint8
+
 const (
-	ClearToEnd ClearType = iota
-	ClearToStart ClearType = iota
+	ClearToEnd      ClearType = iota
+	ClearToStart    ClearType = iota
 	ClearCompletely ClearType = iota
 )
 

@@ -26,7 +26,7 @@ func TestRawCooked(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, err =	term.Read()
+		_, err = term.Read()
 		if err != nil {
 			t.Fatal(err)
 		}

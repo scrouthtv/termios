@@ -14,7 +14,7 @@ func TestClearLine(t *testing.T) {
 
 	var i uint16
 	for i = 0; i < size.Width; i++ {
-		term.Write([]byte{ 'o' })
+		term.Write([]byte{'o'})
 	}
 
 	term.Move(MoveBy(-50, 0))
@@ -35,20 +35,20 @@ func TestClearScreen(t *testing.T) {
 
 	size := term.GetSize()
 	var i uint16
-	for i = 0; i < size.Height * size.Width; i++ {
-		term.Write([]byte{ 'x' })
+	for i = 0; i < size.Height*size.Width; i++ {
+		term.Write([]byte{'x'})
 	}
 
-	term.Move(MoveTo(int(size.Width / 3), int(size.Height / 2)))
+	term.Move(MoveTo(int(size.Width/3), int(size.Height/2)))
 	term.WriteString("Press any key to clear from here down.")
 	term.Read()
 	term.ClearScreen(ClearToEnd)
 	term.Read()
 
-	for i = 0; i < size.Height * size.Width; i++ {
-		term.Write([]byte{ 'x' })
+	for i = 0; i < size.Height*size.Width; i++ {
+		term.Write([]byte{'x'})
 	}
-	term.Move(MoveTo(int(size.Width / 3), int(size.Height / 2)))
+	term.Move(MoveTo(int(size.Width/3), int(size.Height/2)))
 	term.WriteString("Press any key to clear from here down.")
 	term.Read()
 	term.ClearScreen(ClearToStart)

@@ -3,9 +3,9 @@ package termios
 // color_util.go converts colors to VT escape codes which can be used on Unix and newer Windows versions.
 
 import (
-	"strings"
-	"strconv"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 func (vt *vt) setStyle(s Style) error {
@@ -59,9 +59,9 @@ func (vt *vt) color8ToEscapeCode(value uint8, isFg bool) string {
 
 func (vt *vt) color16ToEscapeCode(value uint8, isFg bool) string {
 	if isFg {
-		return "9" + strconv.FormatUint(uint64(value - 8), 10)
+		return "9" + strconv.FormatUint(uint64(value-8), 10)
 	} else {
-		return "10" + strconv.FormatUint(uint64(value - 8), 10)
+		return "10" + strconv.FormatUint(uint64(value-8), 10)
 	}
 }
 

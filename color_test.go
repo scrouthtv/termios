@@ -1,12 +1,16 @@
 package termios
 
-import "testing"
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
 
 func Test8Color(t *testing.T) {
-	names := []string{ "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white" }
-	values := []Color{ ColorBlack, ColorRed, ColorGreen, ColorYellow, ColorBlue,
-		ColorMagenta, ColorCyan, ColorWhite }
+	names := []string{"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"}
+	values := []Color{
+		ColorBlack, ColorRed, ColorGreen, ColorYellow, ColorBlue,
+		ColorMagenta, ColorCyan, ColorWhite,
+	}
 
 	term, err := Open()
 	if err != nil {
@@ -62,9 +66,11 @@ func Test8Color(t *testing.T) {
 }
 
 func Test16Color(t *testing.T) {
-	names := []string{ "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white" }
-	values := []Color{ ColorDarkGray, ColorLightRed, ColorLightGreen, ColorLightYellow, ColorLightBlue,
-		ColorLightMagenta, ColorLightCyan, ColorLightGray }
+	names := []string{"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"}
+	values := []Color{
+		ColorDarkGray, ColorLightRed, ColorLightGreen, ColorLightYellow, ColorLightBlue,
+		ColorLightMagenta, ColorLightCyan, ColorLightGray,
+	}
 
 	term, err := Open()
 	if err != nil {

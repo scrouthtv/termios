@@ -5,13 +5,17 @@ package termios
 // terminfo-builtin.go stores builtin terminfo tables.
 // Currently, terminfo tables for linux, screen, xterm and urxvt are builtin.
 
-import "os"
-import "strings"
+import (
+	"os"
+	"strings"
+)
 
-var linuxInfo info = *newEmptyTerminfo()
-var screenInfo info = *newEmptyTerminfo()
-var xtermInfo info = *newEmptyTerminfo()
-var urxvtInfo info = *newEmptyTerminfo()
+var (
+	linuxInfo  info = *newEmptyTerminfo()
+	screenInfo info = *newEmptyTerminfo()
+	xtermInfo  info = *newEmptyTerminfo()
+	urxvtInfo  info = *newEmptyTerminfo()
+)
 
 func init() {
 	// TODO init the built-in tables
