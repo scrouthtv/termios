@@ -2,71 +2,59 @@ package termios
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
+	"os"
 )
 
+var logger *os.File
+
+func init() {
+	logger, _ = os.Create("/tmp/movement.log")
+}
+
+// move executes the movement by mapping it to one or more of the low-level movement
+// escape codes.
 func (vt *vt) move(m *Movement) error {
 	var err error
 
-	if m.flags == horizAbs && m.x == 0 && m.y == 0 {
-		_, err = vt.term.Write([]byte{0x0d}) // CR
-	} else if m.flags == horizAbs {
-		if m.x == 0 {
-			if m.y > 0 {
-				_, err = fmt.Fprintf(vt.term, "\x1b[%dE", m.y) // move to beginning of m.y lines down
-			} else if m.y < 0 {
-				_, err = fmt.Fprintf(vt.term, "\x1b[%dF", -m.y) // move to beginning of -m.y lines up
-			}
+	switch m.flags {
+	case horizAbs | vertAbs:
+		err = vt.moveTo(m.x, m.y)
+	case horizAbs:
+		if m.flags == horizAbs && m.x == 0 && m.y == 0 {
+			_, err = vt.term.Write([]byte{0x0d}) // CR
 		} else {
-			if m.x < 0 {
+			if m.x == 0 {
+				err = vt.moveToStartBy(m.y)
+			} else if m.x < 0 {
 				return &InvalidMovementError{m.x}
-			}
-			if m.y > 0 {
-				_, err = fmt.Fprintf(vt.term, "\x1b[%dB", m.y) // down m.y lines
+			} else {
+				err = vt.moveVert(m.y)
 				if err != nil {
-					return &IOError{"reading current position", err}
+					return &IOError{"writing new cursor position", err}
 				}
-			} else if m.y < 0 {
-				_, err = fmt.Fprintf(vt.term, "\x1b[%dA", -m.y) // up -m.y lines
-				if err != nil {
-					return &IOError{"reading current position", err}
-				}
+				err = vt.moveToColumn(m.x)
 			}
-			_, err = fmt.Fprintf(vt.term, "\x1b[%dG", m.x) // move to column m.x
 		}
-	} else if m.flags == horizAbs|vertAbs {
-		_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, m.x) // move to position m.x / m.y
-	} else if m.flags == vertAbs {
+	case vertAbs:
 		pos, err := vt.term.GetPosition()
 		if err != nil {
 			return &IOError{"reading current position", err}
 		}
+
 		newx := pos.X + m.x
 		if newx < 0 {
 			newx = 0
 		}
-		//nolint:ineffassign,staticcheck,wastedassign // false positive
-		_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, newx)
-		// move to position newx / m.y
-	} else if m.flags == 0 {
-		if m.x > 0 {
-			_, err = fmt.Fprintf(vt.term, "\x1b[%dC", m.x) // move forward by m.x
-			if err != nil {
-				return &IOError{"writing new position", err}
-			}
-		} else if m.x < 0 {
-			_, err = fmt.Fprintf(vt.term, "\x1b[%dD", -m.x) // move backwards by -m.x
-			if err != nil {
-				return &IOError{"writing new position", err}
-			}
+		fmt.Fprintf(logger, "newx: %d\n", newx)
+
+		err = vt.moveTo(m.x, m.y)
+	case 0:
+		err = vt.moveHoriz(m.x)
+		if err != nil {
+			return &IOError{"reading current position", err}
 		}
 
-		if m.y > 0 {
-			_, err = fmt.Fprintf(vt.term, "\x1b[%dB", m.y) // down m.y lines
-		} else if m.y < 0 {
-			_, err = fmt.Fprintf(vt.term, "\x1b[%dA", -m.y) // up -m.y liens
-		}
+		err = vt.moveVert(m.y)
 	}
 
 	if err != nil {
@@ -76,82 +64,45 @@ func (vt *vt) move(m *Movement) error {
 	return nil
 }
 
-func (vt *vt) clearScreen(c ClearType) error {
+func (vt *vt) moveVert(y int) error {
 	var err error
-
-	switch c {
-	case ClearToEnd:
-		_, err = vt.term.WriteString("\x1b[0J")
-	case ClearToStart:
-		_, err = vt.term.WriteString("\x1b[1J")
-	case ClearCompletely:
-		_, err = vt.term.WriteString("\x1b[2J")
-	default:
-		err = &InvalidClearTypeError{c}
+	if y > 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dB", y)
+	} else if y < 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dA", -y)
 	}
 
-	if err != nil {
-		return &IOError{"clearing screen", err}
-	}
-
-	return nil
+	return err //nolint:wrapcheck // internal routine
 }
 
-func (vt *vt) clearLine(c ClearType) error {
+func (vt *vt) moveHoriz(x int) error {
 	var err error
-
-	switch c {
-	case ClearToEnd:
-		_, err = vt.term.WriteString("\x1b[0K")
-	case ClearToStart:
-		_, err = vt.term.WriteString("\x1b[1K")
-	case ClearCompletely:
-		_, err = vt.term.WriteString("\x1b[2K")
-	default:
-		err = &InvalidClearTypeError{c}
+	if x > 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dC", x)
+	} else if x < 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dD", -x)
 	}
 
-	if err != nil {
-		return &IOError{"clearing screen", err}
-	}
-
-	return nil
+	return err  //nolint:wrapcheck // internal routine
 }
 
-func (vt *vt) getPosition() (*Position, error) {
-	_, err := vt.term.Write([]byte{0x1b, 0x5b, 0x36, 0x6e, 0x0b})
-	if err != nil {
-		return nil, &IOError{"", err}
+func (vt *vt) moveToColumn(x int) error {
+	_, err := fmt.Fprintf(vt.term, "\x1b[%dG", x)
+	return err //nolint:wrapcheck // internal routine
+}
+
+func (vt *vt) moveToStartBy(y int) error {
+	var err error
+	if y > 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dE", y)
+	} else if y < 0 {
+		_, err = fmt.Fprintf(vt.term, "\x1b[%dF", -y)
 	}
 
-	p := make([]byte, 32)
-	n, err := vt.term.readback(p)
-	if err != nil { //nolint:wsl // conflicts with gofumpt
-		return nil, &IOError{"reading current position", err}
-	}
+	return err //nolint:wrapcheck // internal routine
+}
 
-	if n < 6 {
-		return nil, &InvalidResponseError{"reading position", string(p[:n])}
-	}
-
-	if p[0] != 0x1b || p[1] != 0x5b || p[n-1] != 0x52 {
-		return nil, &InvalidResponseError{"reading position", string(p[:n])}
-	}
-
-	pos := strings.Split(string(p[2:n-1]), ";")
-	if len(pos) != 2 {
-		return nil, &InvalidResponseError{"reading position", string(p[:n])}
-	}
-
-	x, err := strconv.Atoi(pos[0])
-	if err != nil {
-		return nil, &InvalidResponseError{"reading position", string(p[:n])}
-	}
-
-	y, err := strconv.Atoi(pos[1])
-	if err != nil {
-		return nil, &InvalidResponseError{"reading position", string(p[:n])}
-	}
-
-	return &Position{x, y}, nil
+func (vt *vt) moveTo(x, y int) error {
+	_, err := fmt.Fprintf(vt.term, "\x1b[%d;%dH", y, x)
+	return err //nolint:wrapcheck // internal routine
 }

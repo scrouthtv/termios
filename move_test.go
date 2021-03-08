@@ -104,9 +104,9 @@ func TestMovement(t *testing.T) {
 	term.Move(MoveTo(6, 0).SetUp(1))
 	term.WriteString("I'm hacking")
 
-	term.Move(MoveTo(0, 10).SetRight(5))
+	term.Move(MoveTo(0, 10).SetRight(5)) // move to line 10 and 5 to the right
 	term.WriteString("Somewhere")
-	term.Move(MoveTo(0, 11).SetRight(5))
+	term.Move(MoveTo(0, 11).SetRight(5)) // move to line 11 and 5 to the right
 	term.WriteString("over the rainbow")
 
 	term.Move(MoveTo(8, 15))
