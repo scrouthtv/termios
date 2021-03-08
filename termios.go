@@ -81,7 +81,8 @@ type TermSize struct {
 // is determined at runtime
 type actor interface {
 	setStyle(Style) error
+	move(*Movement) error
+	getPosition() (*Position, error)
 	clearScreen(ClearType) error
 	clearLine(ClearType) error
-	getPosition() (*Position, error)
 }

@@ -6,7 +6,7 @@ package bwin
 // They specify foreground, background colors and additional styles.
 type Attribute uint16
 
-// see https://docs.microsoft.com/en-us/windows/console/char-info-str.
+// see https://docs.microsoft.com/en-us/windows/console/char-info-str
 // Color Attributes can be mixed to achieve different colors:
 // 0x0 is black, 0xF is white,
 // blue | green | intense is bright cyan.

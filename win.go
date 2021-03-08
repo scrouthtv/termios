@@ -124,6 +124,11 @@ func (t *winTerm) Read() ([]Key, error) {
 	return []Key{*t.p.asKey(iR)}, nil
 }
 
+func (t *winTerm) readback(p []byte) (int, error) {
+	panic("todo")
+	return 0, nil
+}
+
 func (t *winTerm) SetStyle(s Style) error {
 	return t.a.setStyle(s)
 }
@@ -161,14 +166,18 @@ func (t *winTerm) Close() {
 	t.out = windows.InvalidHandle
 }
 
-func (t *winTerm) Clear() error {
-	return t.a.clear()
-}
-
 func (t *winTerm) GetPosition() (*Position, error) {
 	return t.a.getPosition()
 }
 
 func (t *winTerm) Move(m *Movement) error {
 	return t.a.move(m)
+}
+
+func (t *winTerm) ClearLine(c ClearType) error {
+	return t.a.clearLine(c)
+}
+
+func (t *winTerm) ClearScreen(c ClearType) error {
+	return t.a.clearScreen(c)
 }
