@@ -9,14 +9,15 @@ const doDebug = false
 type Terminal interface {
 
 	// Read reads a single keypress
-	// Read returns an array of keys in the order that they were typed
-	// or in case of an error an empty list and the error
-	// The terminal is always openend in what one might consider "raw mode"
+	// and returns an array of keys in the order that they were typed
+	// or in case of an error an empty list and the error.
+	// If the terminal hasn't been set to raw mode, the user must first press enter for keys
+	// to be sent to the application.
 	Read() ([]Key, error)
 
 	// WriteString writes the specified string at the current position into the terminal
 	// It returns the number of bytes (there may be multiple bytes in a character) written
-	// or an error
+	// or an error.
 	WriteString(string) (int, error)
 
 	// Write writes the specified data at the current position into the terminal.
@@ -36,6 +37,19 @@ type Terminal interface {
 
 	// SetStyle sets the terminal style. Not all terminals support all styles (e. g. 24bit colors).
 	SetStyle(Style)
+
+	// GetPosition returns the current cursor position. On some terminals, this takes some time.
+	GetPosition() (*Position, error)
+
+	// Move moves the cursor and point of writing to a new position specified by the Movement.
+	// Implementations will not cross line borders if the provided horizontal movement exceeds line width.
+	Move(*Movement) error
+
+}
+
+type Position struct {
+	X int
+	Y int
 }
 
 // TermSize groups the width and height of a terminal in characters.
