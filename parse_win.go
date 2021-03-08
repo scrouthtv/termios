@@ -6,7 +6,7 @@ package termios
 
 import (
 	"unicode"
-	"termios/bwin"
+	"github.com/scrouthtv/termios/bwin"
 )
 
 type winParser struct {

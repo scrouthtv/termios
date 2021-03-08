@@ -1,3 +1,5 @@
+// +build windows
+
 package bwin
 
 // Coord is a coordinate of a character cell in the console.

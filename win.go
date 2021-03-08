@@ -4,7 +4,7 @@ package termios
 
 import (
 	"golang.org/x/sys/windows"
-	"termios/bwin"
+	"github.com/scrouthtv/termios/bwin"
 )
 
 type winTerm struct {

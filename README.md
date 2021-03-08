@@ -3,6 +3,34 @@ termios
 
 For documentation, see https://pkg.go.dev/github.com/scrouthtv/termios.
 
+Getting started
+---------------
+
+Using `termios` requires some setup and teardown:
+```
+term, err := termios.Open()
+if err != nil {
+	panic(err)
+}
+defer term.Close()
+
+term.ClearScreen(termios.ClearCompletely)
+term.SetStyle(Style{termios.ColorRed, ColorDefault, TextBold})
+term.WriteString("Hello world!")
+
+term.SetRaw(true) // this is needed for input
+keys, err := term.Read()
+if err != nil {
+	term.WriteString("Error reading keys:", keys)
+	return
+}
+if k.Type == termios.KeySpecial && k.Value == termios.SpecialEnter {
+	term.Move(MoveTo(0, 0).SetDown(1)) // move to the beginning of the next column
+}
+
+return
+```
+
 Under construction
 ------------------
 
@@ -34,7 +62,7 @@ I originally adopted this library from *creack* on GitHub. The original project 
 
 The key parsing API supports these keys on all supported terminals:
  - Letters: a-z, A-Z, 0-9, Extended Latin (U+0100 - U+FFFF)
- - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ ` ´
+ - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ \` ´
  - C-[a-z], for C-[A-Z] the lower case variant C-[a-z] should be returned
  - A-letter, A-Letter, A-symbol
  - F1 through F12, C-Fx, S-Fx, C-S-Fx
