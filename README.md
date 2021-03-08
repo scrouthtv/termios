@@ -6,7 +6,10 @@ For documentation, see https://pkg.go.dev/github.com/scrouthtv/termios.
 Getting started
 ---------------
 
-Using `termios` requires some setup and teardown:
+Use `termios` by opening the current terminal. You can then
+ - read keys from the user
+ - write text, clear the terminal
+ - get (window size), set (cursor position, style) properties 
 ```
 term, err := termios.Open()
 if err != nil {
