@@ -110,7 +110,7 @@ func loadTerminfo() (*info, error) {
 		return i, nil
 	} else {
 		// If not (e. g. there is no built-in for this terminal), return the first error
-		return nil, err
+		return nil, &IOError{"getting terminfo", err}
 	}
 }
 

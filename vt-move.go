@@ -93,6 +93,7 @@ func (vt *vt) clearScreen(c ClearType) error {
 	if err != nil {
 		return &IOError{"clearing screen", err}
 	}
+
 	return nil
 }
 
@@ -113,6 +114,7 @@ func (vt *vt) clearLine(c ClearType) error {
 	if err != nil {
 		return &IOError{"clearing screen", err}
 	}
+
 	return nil
 }
 
@@ -124,7 +126,7 @@ func (vt *vt) getPosition() (*Position, error) {
 
 	p := make([]byte, 32)
 	n, err := vt.term.readback(p)
-	if err != nil {
+	if err != nil { //nolint:wsl // conflicts with gofumpt
 		return nil, &IOError{"reading current position", err}
 	}
 
@@ -145,6 +147,7 @@ func (vt *vt) getPosition() (*Position, error) {
 	if err != nil {
 		return nil, &InvalidResponseError{"reading position", string(p[:n])}
 	}
+
 	y, err := strconv.Atoi(pos[1])
 	if err != nil {
 		return nil, &InvalidResponseError{"reading position", string(p[:n])}

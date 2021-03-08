@@ -59,7 +59,7 @@ func Open() (Terminal, error) {
 		unix.Close(in)
 		unix.Close(out)
 
-		return nil, err
+		return nil, &IOError{"getting current termios", err}
 	}
 
 	sCh := make(chan os.Signal, 1)
@@ -117,7 +117,7 @@ func (t *nixTerm) SetRaw(raw bool) error {
 		unix.Close(t.in)  //nolint:errcheck // we've already failed
 		unix.Close(t.out) //nolint:errcheck // we've already failed
 
-		return err
+		return &IOError{"setting termios", err}
 	}
 
 	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
@@ -126,7 +126,7 @@ func (t *nixTerm) SetRaw(raw bool) error {
 		unix.Close(t.in)                                //nolint:errcheck // we've already failed
 		unix.Close(t.out)                               //nolint:errcheck // we've already failed
 
-		return err
+		return &IOError{"setting termios", err}
 	}
 
 	return nil

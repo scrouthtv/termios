@@ -25,8 +25,11 @@ func (vt *vt) setStyle(s Style) error {
 	escape.WriteString("m")
 
 	_, err := vt.term.WriteString(escape.String())
+	if err != nil {
+		return &IOError{"writing color", err}
+	}
 
-	return err
+	return nil
 }
 
 func (vt *vt) colorToEscapeCode(c *Color, isFg bool) string {

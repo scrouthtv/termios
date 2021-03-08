@@ -32,10 +32,12 @@ func TestClearScreen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	term.ClearScreen(ClearCompletely)
 	term.Move(MoveTo(1, 1))
 
 	size := term.GetSize()
+
 	var i uint16
 	for i = 0; i < size.Height*size.Width; i++ {
 		term.Write([]byte{'x'})
