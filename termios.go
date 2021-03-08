@@ -5,7 +5,7 @@ package termios
 const doDebug = false
 
 // Terminal is an abstract terminal where the user can press arbitrary keys
-// and the developer can write arbitrary strings as well as some actions
+// and the developer can write arbitrary strings as well as some actions.
 type Terminal interface {
 
 	// Read reads a single keypress
@@ -79,7 +79,7 @@ type TermSize struct {
 // It is implemented by `vt` and `wincon`.
 // All unix terminals should use the `vt` implementation,
 // while for Windows terminals the correct implementation
-// is determined at runtime
+// is determined at runtime.
 type actor interface {
 	setStyle(Style) error
 	move(*Movement) error

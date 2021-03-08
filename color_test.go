@@ -22,9 +22,17 @@ func Test8Color(t *testing.T) {
 		if len(name) > 10 {
 			name = name[:10]
 		}
-		term.WriteString(fmt.Sprintf("%10s ", name))
+
+		_, err = term.WriteString(fmt.Sprintf("%10s ", name))
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
-	term.WriteString("\r\n")
+
+	_, err = term.WriteString("\r\n")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for fg, fgname := range names {
 		for bg, bgname := range names {
@@ -56,6 +64,7 @@ func Test8Color(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
+
 		_, err = term.WriteString("\r\n")
 		if err != nil {
 			t.Fatal(err)
@@ -65,6 +74,7 @@ func Test8Color(t *testing.T) {
 	term.Close()
 }
 
+//nolint:errcheck // this one should only be tested after 16Color worked successfully
 func Test16Color(t *testing.T) {
 	names := []string{"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"}
 	values := []Color{
@@ -82,23 +92,29 @@ func Test16Color(t *testing.T) {
 		if len(name) > 10 {
 			name = name[:10]
 		}
+
 		term.WriteString(fmt.Sprintf("%10s ", name))
 	}
+
 	term.WriteString("\r\n")
 
 	for fg, fgname := range names {
 		for bg, bgname := range names {
 			term.SetStyle(Style{values[fg], values[bg], 0})
+
 			if len(fgname) > 3 {
 				fgname = fgname[:3]
 			}
+
 			if len(bgname) > 3 {
 				bgname = bgname[:3]
 			}
+
 			term.WriteString(fmt.Sprintf("%3s on %3s", fgname, bgname))
 			term.SetStyle(Style{ColorDefault, ColorDefault, 0})
 			term.WriteString(" ")
 		}
+
 		term.WriteString("\r\n")
 	}
 

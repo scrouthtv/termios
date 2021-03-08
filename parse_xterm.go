@@ -38,7 +38,7 @@ func (p *xtermParser) open() {
 
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'h'})
 
-	p.parent.WriteString(s.String())
+	p.parent.WriteString(s.String()) //nolint:errcheck // nothing to do about it
 }
 
 func (p *xtermParser) exit() {
@@ -50,7 +50,7 @@ func (p *xtermParser) exit() {
 
 	s.Write([]byte{0x1b, '[', '?', '1', '0', '3', '9', 'l'})
 
-	p.parent.WriteString(s.String())
+	p.parent.WriteString(s.String()) //nolint:errcheck // nothing to do about it
 }
 
 func (p *xtermParser) asKey(in []byte) []Key {

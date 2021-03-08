@@ -131,5 +131,6 @@ nextSpecial:
 			return k, len(c)
 		}
 	}
+
 	return InvalidKey, 1
 }

@@ -2,6 +2,7 @@ package termios
 
 import "testing"
 
+//nolint:errcheck // it's a test function
 func TestClearLine(t *testing.T) {
 	term, err := Open()
 	if err != nil {
@@ -25,6 +26,7 @@ func TestClearLine(t *testing.T) {
 	term.Read()
 }
 
+//nolint:errcheck // it's a test function
 func TestClearScreen(t *testing.T) {
 	term, err := Open()
 	if err != nil {
@@ -79,6 +81,7 @@ get the camera
 --- PASS: TestMovement (0.03s)
 */
 
+//nolint:errcheck // it's a test function
 func TestMovement(t *testing.T) {
 	term, err := Open()
 	if err != nil {
@@ -126,7 +129,6 @@ func TestPosition(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	term.SetRaw(true)
 	t.Log(term.GetPosition())
 
 	term.Close()

@@ -4,22 +4,22 @@ import (
 	"unicode/utf8"
 )
 
-// Key is any key of the keyboard that is read by the OS
+// Key is an abstract key combination on the keyboard.
 type Key struct {
 	Type  byte
 	Mod   byte
 	Value rune
 }
 
-// InvalidKey is returned if an error occured during reading
+// InvalidKey is returned if an error ocured during reading.
 var InvalidKey = Key{KeyInvalid, 0, utf8.RuneError}
 
 const (
 	// KeyLetter is a single letter. Value is a keycode out of the Basic Latin keymap.
 	KeyLetter = iota
-	// KeySpecial indicates that this key should not be printed, but be interpreted instead
+	// KeySpecial indicates that this key should not be printed, but be interpreted instead.
 	KeySpecial
-	// KeyInvalid is an invalid key, e. g. if an error occured during parsing
+	// KeyInvalid is an invalid key, e. g. if an error ocured during parsing.
 	KeyInvalid
 )
 

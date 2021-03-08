@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+const (
+	brightOffset = 8
+)
+
 func (vt *vt) setStyle(s Style) error {
 	if s.Extras != 0 {
 		panic("styles not impl")
@@ -21,6 +25,7 @@ func (vt *vt) setStyle(s Style) error {
 	escape.WriteString("m")
 
 	_, err := vt.term.WriteString(escape.String())
+
 	return err
 }
 
@@ -59,9 +64,9 @@ func (vt *vt) color8ToEscapeCode(value uint8, isFg bool) string {
 
 func (vt *vt) color16ToEscapeCode(value uint8, isFg bool) string {
 	if isFg {
-		return "9" + strconv.FormatUint(uint64(value-8), 10)
+		return "9" + strconv.FormatUint(uint64(value-brightOffset), 10)
 	} else {
-		return "10" + strconv.FormatUint(uint64(value-8), 10)
+		return "10" + strconv.FormatUint(uint64(value-brightOffset), 10)
 	}
 }
 

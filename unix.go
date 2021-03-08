@@ -32,7 +32,7 @@ type nixTerm struct {
 	vt      actor
 }
 
-// Open opens a new terminal for raw i/o
+// Open opens a new terminal.
 func Open() (Terminal, error) {
 	var err error
 
@@ -58,6 +58,7 @@ func Open() (Terminal, error) {
 	if err != nil {
 		unix.Close(in)
 		unix.Close(out)
+
 		return nil, err
 	}
 
@@ -113,16 +114,18 @@ func (t *nixTerm) SetRaw(raw bool) error {
 	// set termios:
 	err = unix.IoctlSetTermios(t.in, reqSetTermios, mode)
 	if err != nil {
-		unix.Close(t.in)
-		unix.Close(t.out)
+		unix.Close(t.in)  //nolint:errcheck // we've already failed
+		unix.Close(t.out) //nolint:errcheck // we've already failed
+
 		return err
 	}
 
 	err = unix.IoctlSetTermios(t.out, reqSetTermios, mode)
 	if err != nil {
-		unix.IoctlSetTermios(t.in, reqSetTermios, mode)
-		unix.Close(t.in)
-		unix.Close(t.out)
+		unix.IoctlSetTermios(t.in, reqSetTermios, mode) //nolint:errcheck // we've already failed
+		unix.Close(t.in)                                //nolint:errcheck // we've already failed
+		unix.Close(t.out)                               //nolint:errcheck // we've already failed
+
 		return err
 	}
 
@@ -130,13 +133,13 @@ func (t *nixTerm) SetRaw(raw bool) error {
 }
 
 func (t *nixTerm) signalHandler() {
-	var signal os.Signal
+	var sig os.Signal
 	var doClose bool
 
 	for {
 		select {
-		case signal = <-t.sCh:
-			switch signal {
+		case sig = <-t.sCh:
+			switch sig {
 			case unix.SIGWINCH:
 				t.readSize()
 			case unix.SIGTSTP:
@@ -203,11 +206,11 @@ func (t *nixTerm) Close() {
 
 	t.p.exit()
 
-	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)
-	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode)
+	unix.IoctlSetTermios(t.in, reqSetTermios, &t.oldMode)  //nolint:errcheck // we're closing anyways
+	unix.IoctlSetTermios(t.out, reqSetTermios, &t.oldMode) //nolint:errcheck // we're closing anyways
 
-	unix.Close(t.in)
-	unix.Close(t.out)
+	unix.Close(t.in)  //nolint:errcheck // we're closing anyways
+	unix.Close(t.out) //nolint:errcheck // we're closing anyways
 
 	t.in = -1
 	t.out = -1
@@ -263,6 +266,7 @@ func newParser(parent *nixTerm) (unixParser, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &linuxParser{parent, i}, nil
 }
 

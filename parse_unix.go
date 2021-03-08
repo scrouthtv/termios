@@ -12,22 +12,22 @@ import (
 )
 
 // linuxParser is the default parser for linux terminals that should always work.
-// It compares entered key sequences to a terminfo (either on disk or built-in)
+// It compares entered key sequences to a terminfo (either on disk or built-in).
 type linuxParser struct {
 	parent *nixTerm
 	i      *info
 }
 
 func (p *linuxParser) open() {
-	p.parent.Write(p.formatSimpleAction(ActionInit))
+	p.parent.Write(p.formatSimpleAction(ActionInit)) //nolint:errcheck // nothing to do about it
 }
 
 func (p *linuxParser) exit() {
 	// FIXME: reset to the mode we were in when we first started
-	p.parent.Write(p.formatSimpleAction(ActionExit))
+	p.parent.Write(p.formatSimpleAction(ActionExit)) //nolint:errcheck // nothing to do about it
 }
 
-// ParseUTF8 splits the inputted bytes into logical keypresses
+// ParseUTF8 splits the inputted bytes into logical keypresses.
 func (p *linuxParser) asKey(in []byte) []Key {
 	var keys []Key
 

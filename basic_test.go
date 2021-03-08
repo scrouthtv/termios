@@ -49,9 +49,7 @@ func TestRawCooked(t *testing.T) {
 }
 
 func TestBasicOpen(t *testing.T) {
-	var term Terminal
-	var err error
-	term, err = Open()
+	term, err := Open()
 	if err != nil {
 		t.Error(err)
 	}
@@ -87,35 +85,12 @@ func TestSizeReading(t *testing.T) {
 	}
 
 	for i := 0; i < 20; i++ {
-		term.WriteString(fmt.Sprintf("Current size: width %d, height %d\r\n",
+		_, err = term.WriteString(fmt.Sprintf("Current size: width %d, height %d\r\n",
 			term.GetSize().Width, term.GetSize().Height))
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		time.Sleep(1 * time.Second)
 	}
 }
-
-// FIXED in a3abd28, partly reintroduced in e62fe12:
-/*func TestUmls(t *testing.T) {
-	term, err := Open()
-	if err != nil {
-		t.Error(err)
-	}
-
-	vT := term.(*winTerm)
-
-	term.SetRaw(true)
-
-	var s string = "aäoöÜ"
-	var rs []rune = []rune(s)
-	var text []uint16 = make([]uint16, len(rs))
-
-	for i, r := range rs {
-		text[i] = uint16(r)
-	}
-
-	var written uint32 = 0
-
-	err = windows.WriteConsole(vT.out, &text[0], 5, &written, nil)
-	if err != nil {
-		t.Error(err)
-	}
-}*/

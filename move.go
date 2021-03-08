@@ -49,30 +49,35 @@ func MoveDown(x int) *Movement {
 func (m *Movement) SetColumn(col int) *Movement {
 	m.flags |= horizAbs
 	m.x = col
+
 	return m
 }
 
 func (m *Movement) SetDown(n int) *Movement {
 	m.flags &^= vertAbs
 	m.y = n
+
 	return m
 }
 
 func (m *Movement) SetUp(n int) *Movement {
 	m.flags &^= vertAbs
 	m.y = -n
+
 	return m
 }
 
 func (m *Movement) SetRight(n int) *Movement {
 	m.flags &^= horizAbs
 	m.x = n
+
 	return m
 }
 
 func (m *Movement) SetLeft(n int) *Movement {
 	m.flags &^= horizAbs
 	m.x = -n
+
 	return m
 }
 

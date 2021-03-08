@@ -46,7 +46,9 @@ func (vt *vt) move(m *Movement) error {
 		if newx < 0 {
 			newx = 0
 		}
-		_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, newx) // move to position newx / m.y
+		//nolint:ineffassign,staticcheck,wastedassign // false positive
+		_, err = fmt.Fprintf(vt.term, "\x1b[%d;%dH", m.y, newx)
+		// move to position newx / m.y
 	} else if m.flags == 0 {
 		if m.x > 0 {
 			_, err = fmt.Fprintf(vt.term, "\x1b[%dC", m.x) // move forward by m.x
@@ -70,6 +72,7 @@ func (vt *vt) move(m *Movement) error {
 	if err != nil {
 		return &IOError{"writing new position", err}
 	}
+
 	return nil
 }
 
@@ -124,6 +127,7 @@ func (vt *vt) getPosition() (*Position, error) {
 	if err != nil {
 		return nil, &IOError{"reading current position", err}
 	}
+
 	if n < 6 {
 		return nil, &InvalidResponseError{"reading position", string(p[:n])}
 	}
