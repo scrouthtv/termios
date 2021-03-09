@@ -1,0 +1,15 @@
+Detecting VT support
+====================
+
+Three possible outcomes:
+ - VT emu supported
+ - VT emu not supported
+ - error occurred during testing
+
+For testing whether it's supported:
+ - try to set ENABLE_VIRTUAL_TERMINAL_PROCESSING
+   - if no error returned -> VT emu is supported
+   - if an error is returned, cast it to a syscall.Errno
+     - if it is not a syscall.Errno -> error occurred during testing
+		 - if it is one and it's value != 87 -> error occurred during testing
+		 - if it is one and it's value == 87 -> V emu not supported
