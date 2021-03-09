@@ -14,7 +14,7 @@ import (
 const ioBufSize int = 128
 
 type unixParser interface {
-	open()
+	open() error
 	exit()
 	asKey(in []byte) []Key
 }
@@ -81,7 +81,13 @@ func Open() (Terminal, error) {
 
 	t.p = p
 
-	p.open()
+	err = p.open()
+	if err != nil {
+		unix.Close(in)
+		unix.Close(out)
+		return nil, err
+	}
+
 	t.readSize()
 
 	go t.signalHandler()
@@ -254,10 +260,6 @@ func (t *nixTerm) readback(p []byte) (int, error) {
 }
 
 func newParser(parent *nixTerm) (unixParser, error) {
-	if os.Getenv("TERM") == "xterm" {
-		panic("todo") // TODO
-	}
-
 	if os.Getenv("TERM") == "xterm" {
 		return &xtermParser{parent}, nil
 	}

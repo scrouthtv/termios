@@ -56,6 +56,7 @@ func TestBasicOpen(t *testing.T) {
 
 	var buf []Key
 
+	term.SetRaw(true)
 	for i := 0; i < 100; i++ {
 		buf, err = term.Read()
 		if err != nil {

@@ -18,8 +18,9 @@ type linuxParser struct {
 	i      *info
 }
 
-func (p *linuxParser) open() {
-	p.parent.Write(p.formatSimpleAction(ActionInit)) //nolint:errcheck // nothing to do about it
+func (p *linuxParser) open() error {
+	_, err := p.parent.Write(p.formatSimpleAction(ActionInit))
+	return err
 }
 
 func (p *linuxParser) exit() {
@@ -89,6 +90,9 @@ func (p *linuxParser) asKey(in []byte) []Key {
 		} else if r, l = utf8.DecodeRune(in[position:]); unicode.IsGraphic(r) {
 			keys = append(keys, Key{KeyLetter, 0, r})
 			position += l
+		} else {
+			keys = append(keys, InvalidKey)
+			position++
 		}
 	}
 
