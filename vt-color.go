@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-const (
-	brightOffset = 8
-)
-
 func (vt *vt) setStyle(s Style) error {
 	if s.Extras != 0 {
 		panic("styles not impl")

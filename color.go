@@ -1,5 +1,9 @@
 package termios
 
+const (
+	brightOffset = 8
+)
+
 // Color is a color of a specified spectrum.
 type Color struct {
 	s Spectrum

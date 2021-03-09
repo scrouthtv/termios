@@ -25,3 +25,6 @@ _testmain.go
 
 # Log files
 *.log
+
+# vim swap files
+*.swp

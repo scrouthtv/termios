@@ -11,21 +11,54 @@ type wincon struct {
 }
 
 func (a *wincon) setStyle(s Style) error {
-	panic("todo") // TODO
-	return nil
+	fg := a.mapColorToWindows(true, s.Foreground)
+	bg := a.mapColorToWindows(false, s.Background)
+	attr := a.mapAttrToWindows(s.Extras)
+	return bwin.SetConsoleTextAttribute(a.parent.out, fg | bg | attr)
+}
+
+func (a *wincon) mapAttrToWindows(t TextAttribute) bwin.Attribute {
+	switch t {
+	case TextUnderlined,TextBold:
+		return bwin.CommonLVBUnderscore
+	case TextReverse:
+		return bwin.CommonLVBReverseVideo
+	default:
+		return 0
+	}
 }
 
 func (a *wincon) mapColorToWindows(isfg bool, c Color) bwin.Attribute {
 	value := c.Downsample(Spectrum16).basic
+
+	if value == ColorDefault.basic {
+		return a.defaultcolor(isfg)
+	} else if value >= ColorBlack.basic && value <= ColorWhite.basic {
+		return a.map8ColorToWindows(isfg, value)
+	} else if value >= ColorDarkGray.basic && value <= ColorLightGray.basic {
+		if isfg {
+			return a.map8ColorToWindows(true, value - brightOffset) | bwin.ForegroundIntensity
+		} else {
+			return a.map8ColorToWindows(false, value - brightOffset) | bwin.BackgroundIntensity
+		}
+	} else {
+		return a.defaultcolor(isfg)
+	}
+
+}
+
+func (a *wincon) defaultcolor(isfg bool) bwin.Attribute {
+	if isfg {
+		return bwin.ForegroundBlue | bwin.ForegroundGreen | bwin.ForegroundRed
+	} else {
+		return 0
+	}
+}
+
+
+func (a *wincon) map8ColorToWindows(isfg bool, value uint8) bwin.Attribute {
 	switch value {
 	case ColorDefault.basic:
-		if isfg {
-			panic("todo") // TODO test is this the actual default color
-			return bwin.ForegroundBlue | bwin.ForegroundGreen | bwin.ForegroundRed | bwin.ForegroundIntensity
-		} else {
-			panic("todo") // TODO
-			return 0
-		}
 	case ColorBlack.basic:
 		return 0
 	case ColorRed.basic:
@@ -58,8 +91,18 @@ func (a *wincon) mapColorToWindows(isfg bool, c Color) bwin.Attribute {
 		} else {
 			return bwin.BackgroundRed | bwin.BackgroundBlue
 		}
-	default:
-		panic("todo") // TODO
+	case ColorCyan.basic:
+		if isfg {
+			return bwin.ForegroundGreen | bwin.ForegroundBlue
+		} else {
+			return bwin.BackgroundGreen | bwin.BackgroundBlue
+			}
+	case ColorWhite.basic:
+		if isfg {
+			return bwin.ForegroundRed | bwin.ForegroundGreen | bwin.ForegroundBlue
+		} else {
+			return bwin.BackgroundRed | bwin.BackgroundGreen | bwin.BackgroundBlue
+		}
 	}
 	return 0
 }
