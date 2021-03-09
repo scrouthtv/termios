@@ -65,7 +65,7 @@ I originally adopted this library from *creack* on GitHub. The original project 
 
 The key parsing API supports these keys on all supported terminals:
  - Letters: a-z, A-Z, 0-9, Extended Latin (U+0100 - U+FFFF)
- - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \ \` ´
+ - Symbols: + - * # ~ , . - ; : _ < > | ^ ° ! " § $ % & / ( ) = ? { } [ ] \\ \` ´
  - C-[a-z], for C-[A-Z] the lower case variant C-[a-z] should be returned
  - A-letter, A-Letter, A-symbol
  - F1 through F12, C-Fx, S-Fx, C-S-Fx
@@ -86,6 +86,8 @@ Supported terminals
     * ConEmu >= 210206
     * Fluent Terminal >= 0.7.5
  - Linux:
+ 		* xterm >= #197
+		* termite (tested on v15)
     * Windows Terminal >= 1.6 via WSL
 
 Known issues
@@ -98,6 +100,8 @@ Known issues
  - Windows/ConEmu does not send C-PgUp, C-PgDown by default (bound to scroll up / down)
  - Windows/Fluent Terminal hides a lot of keys: https://github.com/felixse/FluentTerminal/issues/885
  - Linux sends C-m instead of enter, C-j instead of C-enter, ...
+ - Linux sends ' instead of ´ if typed as ´<space>, press it twice instead
+ - xterm does not send A-| if typed as "alt gr" + < (german keyboard layout)
 
 termios
 -------
