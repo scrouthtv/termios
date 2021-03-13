@@ -18,14 +18,16 @@ func (a *wincon) setStyle(s Style) error {
 }
 
 func (a *wincon) mapAttrToWindows(t TextAttribute) bwin.Attribute {
-	switch t {
-	case TextUnderlined,TextBold:
-		return bwin.CommonLVBUnderscore
-	case TextReverse:
-		return bwin.CommonLVBReverseVideo
-	default:
-		return 0
+	var b bwin.Attribute
+
+	if t & (TextUnderlined|TextBold) != 0 {
+		b |= bwin.CommonLVBUnderscore
 	}
+	if t & TextReverse != 0 {
+		b |= bwin.CommonLVBReverseVideo
+	}
+
+	return b
 }
 
 func (a *wincon) mapColorToWindows(isfg bool, c Color) bwin.Attribute {
