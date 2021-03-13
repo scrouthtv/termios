@@ -52,11 +52,12 @@ func Open() (Terminal, error) {
 
 	var t winTerm = winTerm{in, out, true, false, inMode, outMode, nil, nil}
 
-	// TODO do we support VT codes instead?
-	t.a = &wincon{&t}
-
-	if false {
+	if t.tryVT() {
 		t.a = &vt{&t}
+		t.WriteString("Using vt")
+	} else {
+		t.a = &wincon{&t}
+		t.WriteString("Using wincon")
 	}
 
 	var p *winParser
@@ -67,6 +68,12 @@ func Open() (Terminal, error) {
 	t.p = p
 
 	return &t, nil
+}
+
+func (t *winTerm) tryVT() bool {
+	m := t.oldOutMode | windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING
+	err := windows.SetConsoleMode(t.out, m)
+	return err == nil
 }
 
 // SetRaw (un-) sets the terminal's stdin & stdout to raw mode.
