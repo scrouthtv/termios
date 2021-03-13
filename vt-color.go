@@ -9,12 +9,11 @@ import (
 )
 
 func (vt *vt) setStyle(s Style) error {
-	if s.Extras != 0 {
-		panic("styles not impl")
-	}
-
 	var escape strings.Builder
-	escape.WriteString("\x1b[")
+	escape.WriteString("\x1b[0;")
+
+	vt.writeExtras(s.Extras, &escape)
+
 	escape.WriteString(vt.colorToEscapeCode(&s.Foreground, true))
 	escape.WriteString(";")
 	escape.WriteString(vt.colorToEscapeCode(&s.Background, false))
@@ -26,6 +25,30 @@ func (vt *vt) setStyle(s Style) error {
 	}
 
 	return nil
+}
+
+func (vt *vt) writeExtras(e TextAttribute, out *strings.Builder) {
+	if e & TextBold != 0 {
+		out.WriteString("1;")
+	}
+	if e & TextDim != 0 {
+		out.WriteString("2;")
+	}
+	if e & TextUnderlined != 0 {
+		out.WriteString("4;")
+	}
+	if e & TextBlink != 0 {
+		out.WriteString("5;")
+	}
+	if e & TextReverse != 0 {
+		out.WriteString("7;")
+	}
+	if e & TextHidden != 0 {
+		out.WriteString("8;")
+	}
+	if e & TextCursive != 0 {
+		out.WriteString("3;")
+	}
 }
 
 func (vt *vt) colorToEscapeCode(c *Color, isFg bool) string {

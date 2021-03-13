@@ -5,6 +5,25 @@ import (
 	"testing"
 )
 
+func TestAttr(t *testing.T) {
+	names := []string{"bold", "dim", "underlined", "blink", "reverse", "hidden", "cursive", "underlined blink", "reverse cursive", "bold reverse underlined blink"}
+	values := []TextAttribute{ TextBold, TextDim, TextUnderlined, TextBlink, TextReverse, TextHidden, TextCursive,
+			TextUnderlined | TextBlink, TextReverse | TextCursive, TextBold | TextReverse | TextUnderlined | TextBlink }
+
+	term, err := Open()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer term.Close()
+
+	for i, name := range names {
+		term.SetStyle(Style{ColorDefault, ColorDefault, values[i]})
+		term.WriteString(name)
+		term.Write([]byte{ '\n' })
+	}
+	term.SetStyle(Style{ColorDefault, ColorDefault, 0})
+}
+
 func Test8Color(t *testing.T) {
 	names := []string{"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"}
 	values := []Color{

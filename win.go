@@ -54,10 +54,8 @@ func Open() (Terminal, error) {
 
 	if t.tryVT() {
 		t.a = &vt{&t}
-		t.WriteString("Using vt")
 	} else {
 		t.a = &wincon{&t}
-		t.WriteString("Using wincon")
 	}
 
 	var p *winParser

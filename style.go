@@ -12,6 +12,9 @@ type Style struct {
 type TextAttribute uint8
 
 const (
+	// TextDefault unsets all text attributes.
+	TextDefault TextAttribute = 0
+
 	// TextBold makes the text appear bold.
 	// On some terminals it will create bright text instead.
 	TextBold TextAttribute = 0x1
