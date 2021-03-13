@@ -11,7 +11,6 @@ type coldef map[*Color]RGB
 
 var coldef8 = make(coldef)
 var coldef16 = make(coldef)
-var coldef256 = make(coldef)
 
 func init() {
 	coldef8[&ColorBlack] = RGB{ 0, 0, 0 }
@@ -39,6 +38,4 @@ func init() {
 	coldef16[&ColorLightMagenta] = RGB{ 255, 0, 255 }
 	coldef16[&ColorLightCyan] = RGB{ 0, 255, 255 }
 	coldef16[&ColorLightGray] = RGB{ 255, 255, 255 }
-
-
 }
