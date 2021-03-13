@@ -1,5 +1,7 @@
 package termios
 
+import "math"
+
 const (
 	brightOffset = 8
 )
@@ -63,7 +65,7 @@ var (
 	// ColorLightCyan is the cyan color, mixed from green and blue.
 	ColorLightCyan = Color{Spectrum16, 14, 0, 0}
 
-	// ColorLightGray is the white color, mixed from red, green and blue.
+	// ColorLightGray is even brighter than white, mixed from red, green and blue.
 	ColorLightGray = Color{Spectrum16, 15, 0, 0}
 )
 
@@ -75,10 +77,24 @@ func (c *Color) Spectrum() Spectrum {
 // Downsample returns the closest color in the specified target spectrum.
 // If target has more colors than the original color's spectrum, the old color is returned.
 func (c *Color) Downsample(target Spectrum) *Color {
-	if target >= c.s {
+	if target.MoreThan(&c.s) || target.Equal(&c.s) {
 		return c
 	}
 
 	// TODO
 	return nil
+}
+
+// Difference returns the difference between two colors on a scale from 0 to 255.
+// E.g. if the colors are completely inverted, Difference returns 255,
+// if they're very close colors (just a pitch more red), Difference returns 
+// a number close to 0.
+func (c *RGB) Difference(other *RGB) uint8 {
+	var diff uint8
+
+	diff += uint8(math.Abs(float64(c.r - other.r) / 3))
+	diff += uint8(math.Abs(float64(c.g - other.g) / 3))
+	diff += uint8(math.Abs(float64(c.b - other.b) / 3))
+
+	return diff
 }

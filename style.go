@@ -70,3 +70,7 @@ const (
 func (s *Spectrum) MoreThan(other *Spectrum) bool {
 	return uint8(*s) > uint8(*other)
 }
+
+func (s *Spectrum) Equal(other *Spectrum) bool {
+	return *s == *other
+}
