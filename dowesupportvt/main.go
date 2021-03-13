@@ -39,9 +39,8 @@ func testVTSupport(con windows.Handle) (bool, error) {
 
 	mode := oldMode
 	mode |= windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING
-	r1, r2, err := setConsoleMode(con, mode)
+	err = windows.SetConsoleMode(con, mode)
 	fmt.Println(reflect.TypeOf(err))
-	fmt.Println(r1, r2, err)
 	defer windows.SetConsoleMode(con, oldMode)
 
 	serr, ok := err.(syscall.Errno)
